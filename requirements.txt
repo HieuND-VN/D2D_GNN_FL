@@ -1,0 +1,8 @@
+torch~=2.0.1
+opacus~=1.4.0
+calmsize~=0.1.3
+numpy~=1.25.1
+matplotlib~=3.7.2
+scikit-learn~=1.3.0
+h5py~=3.9.0
+torchvision~=0.15.2

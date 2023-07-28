@@ -1,34 +1,24 @@
-#!/usr/bin/env python
-import copy
 import torch
 import argparse
 import os
 import time
 import warnings
 import numpy as np
-import torchvision
 import logging
-# test git hub
 
 from flcore.servers.serveravg import FedAvg
 
 from flcore.trainmodel.models import *
 
-from flcore.trainmodel.bilstm import BiLSTM_TextClassification
-# from flcore.trainmodel.resnet import resnet18 as resnet
-from flcore.trainmodel.alexnet import alexnet
-from flcore.trainmodel.mobilenet_v2 import mobilenet_v2
-from utils.result_utils import average_data
 from utils.mem_utils import MemReporter
-from utils.data_utils import show_result_graph
+
+from utils.environment import Env
 
 logger = logging.getLogger()
 logger.setLevel(logging.ERROR)
 
 warnings.simplefilter("ignore")
 torch.manual_seed(0)
-
-# hyper-params for Text tasks
 def run(args):
     time_list = []
     reporter = MemReporter()
@@ -37,7 +27,6 @@ def run(args):
         print(f"\n============= Running time: {i}th =============")
         print("Creating server and clients ...")
         start = time.time()
-        # Generate args.model
         args.model = IGCNet().to(args.device)
         print(args.model)
 
@@ -106,13 +95,14 @@ if __name__ == "__main__":
     parser.add_argument('-tth', "--time_threthold", type=float, default=10000,
                         help="The threthold for droping slow clients")
     # GraphNN
-    parser.add_argument('-trs', "--train_samples", type=int, default=3000)
-    parser.add_argument('-tes', "--test_samples", type=int, default=500)
-    parser.add_argument('-nu', "--num_ue", type=int, default=20)
-    parser.add_argument('-var', "--var_db", type=int, default=1)
-    parser.add_argument('-itf', "--interference", type=float, default=0.5,
+    parser.add_argument('-trs', "--train_samples", type = int, default = 3000)
+    parser.add_argument('-tes', "--test_samples", type = int, default = 500)
+    parser.add_argument('-uemin', "--num_ue_min", type = int, default = 10)
+    parser.add_argument('-uemax', "--num_ue_max", type = int, default = 60)
+    parser.add_argument('-var', "--var_db", type = int, default = 1)
+    parser.add_argument('-itf', "--interference", type = float, default = 0.5,
                         help="Normalize Interference in Case2")
-    parser.add_argument('-stepsz', "--step_size", type=int, default=20,
+    parser.add_argument('-stepsz', "--step_size", type = int, default = 20,
                         help="Step size using in scheduler_clientbase")
 
     args = parser.parse_args()
@@ -148,5 +138,5 @@ if __name__ == "__main__":
     if args.device == "cuda":
         print("Cuda device id: {}".format(os.environ["CUDA_VISIBLE_DEVICES"]))
     print("=" * 50)
-
+    env = Env(args)
     run(args)
