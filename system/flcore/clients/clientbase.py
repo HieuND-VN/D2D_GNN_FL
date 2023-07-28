@@ -87,6 +87,7 @@ class Client(object):
             return DataLoader(train_data, batch_size, drop_last=True, shuffle=False)
 
     def load_test_data(self, batch_size=None):
+
         if batch_size == None:
             batch_size = self.batch_size
         if self.is_graph:
