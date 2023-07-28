@@ -23,6 +23,7 @@ class Env():
         self.num_ue_case6 = 50
         self.num_ue_case7 = args.num_ue_max  # 60
         self.diameter = args.diameter
+        #Note
 
         # Channel information
         self.var_db = args.var_db
