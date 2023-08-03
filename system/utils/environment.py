@@ -67,7 +67,7 @@ class Env():
             num_ue = self.num_ue_case5
 
         data_client = self.proc_data(num_sample, num_ue)
-        return 3h data_client
+        return data_client
 
     def proc_data(self, num_sample, num_ue):
         data_list = []
