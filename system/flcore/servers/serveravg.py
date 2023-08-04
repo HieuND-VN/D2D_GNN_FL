@@ -38,9 +38,9 @@ class FedAvg(Server):
             self.aggregate_parameters()
 
             self.Budget.append(time.time() - s_t)
-            print('-'*10,'>' 'time cost: ', self.Budget[-1])
+            print('>'*10, 'time cost: ', self.Budget[-1])
 
-        print(f'Best result: -Train: {min(self.train_loss_save)*-1} -Test: {min(self.test_loss_save)*-1}')
+        print(f'Best result: -Train: {max(self.train_loss_save)*-1} -Test: {max(self.test_loss_save)*-1}')
 
         self.illustrate()
 

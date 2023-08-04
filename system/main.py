@@ -56,7 +56,7 @@ if __name__ == "__main__":
     parser.add_argument('-lr', "--local_learning_rate", type=float, default=0.005, help="Local learning rate")
     parser.add_argument('-ld', "--learning_rate_decay", type=bool, default=False)
     parser.add_argument('-ldg', "--learning_rate_decay_gamma", type=float, default=0.99)
-    parser.add_argument('-gr', "--global_rounds", type=int, default=1000)
+    parser.add_argument('-gr', "--global_rounds", type=int, default=50)
     parser.add_argument('-ls', "--local_steps", type=int, default=1)
     parser.add_argument('-algo', "--algorithm", type=str, default="FedAvg")
     parser.add_argument('-jr', "--join_ratio", type=float, default=1.0,
@@ -87,8 +87,8 @@ if __name__ == "__main__":
     parser.add_argument('-tth', "--time_threthold", type=float, default=10000,
                         help="The threthold for droping slow clients")
     # GraphNN
-    parser.add_argument('-ntr', "--num_train", type = int, default = 3000)
-    parser.add_argument('-nte', "--num_test", type = int, default = 500)
+    parser.add_argument('-ntr', "--num_train", type = int, default = 300)
+    parser.add_argument('-nte', "--num_test", type = int, default = 50)
     parser.add_argument('-uemin', "--num_ue_min", type = int, default = 10)
     parser.add_argument('-uemax', "--num_ue_max", type = int, default = 60)
     parser.add_argument('-var', "--var_db", type = int, default = 1)

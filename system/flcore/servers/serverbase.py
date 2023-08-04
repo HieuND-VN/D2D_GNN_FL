@@ -218,8 +218,8 @@ class Server(object):
             count += len(parameter.data)
 
             # print(f'The total number of parameters in all clients: {count*self.num_clients}')
-        print("Averaged Train Loss: {:.4f}".format(train_loss))
-        print("Averaged Test Loss: {:.4f}".format(test_loss))
+        print("Averaged Train Loss: {:.4f}".format(train_loss*-1))
+        print("Averaged Test Loss: {:.4f}".format(test_loss*-1))
         self.train_loss_save.append(train_loss*-1)
         self.test_loss_save.append(test_loss*-1)
 
@@ -261,3 +261,4 @@ class Server(object):
         plt.plot(self.test_loss_save, label='Testing')
         plt.plot(x,SumRateMMSEplot, label = 'Optimization')
         plt.legend()
+        plt.show()
