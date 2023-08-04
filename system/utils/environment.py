@@ -46,6 +46,35 @@ class Env():
         self.Pd = 1 / self.ther_noise
         self.Pu = self.Pd
 
+    def env_print(self):
+        print("===========================System Model======================================")
+        print(f"Number of mobile users in each client (each cell): {self.num_ue_case1}")
+        print(f"Bandwidth of the channel: {self.bandwidth} MHz")
+        print(f"Frequency of the channel: {self.freq}")
+        print("=============================================================================")
+
+    def create_pathloss(self, num_ue, num_sample):
+        # pathloss_client = np.zeros((num_sample, 1, num_ue))
+        pathloss_client = np.zeros((num_sample, num_ue, num_ue))
+        for ite in range(num_sample):
+            AP = np.zeros(2,)
+            UE = np.random.uniform(-1,1, size = (num_ue, 2))
+            pathloss_sample = np.zeros((1, num_ue))
+            for k in range(num_ue):
+                dist = np.linalg.norm(AP - UE[k, :])
+                if dist < self.d0:
+                    PL = -self.L - 35 * np.log10(self.d1) + 20 * np.log10(self.d1) - 20 * np.log10(self.d0)
+                elif dist >= self.d0 and dist <= self.d1:
+                    PL = -self.L - 35 * np.log10(self.d1) + 20 * np.log10(self.d1) - 20 * np.log10(dist)
+                else:
+                    PL = -self.L - 35 * np.log10(dist) + np.random.normal(0,1) * 7
+
+                pathloss_sample[0, k] = 10 ** (PL / 10) * self.Pd
+            pathloss_client[ite,:,:] = pathloss_sample
+        return pathloss_client
+
+
+
     def create_graph_data(self, id, is_train=False, case=1):
         # select num_sample
         if is_train:
@@ -105,8 +134,11 @@ class Env():
         Pini = Pmax * np.ones((num_sample, num_ue, 1))
         alpha = np.random.rand(num_sample, num_ue)
         alpha2 = np.ones((num_sample, num_ue))
-        CH = 1 / np.sqrt(2) * (
-                    np.random.rand(num_sample, num_ue, num_ue) + 1j * np.random.rand(num_sample, num_ue, num_ue))
+        # CH = 1 / np.sqrt(2) * (
+        #             np.random.rand(num_sample, num_ue, num_ue) + 1j * np.random.rand(num_sample, num_ue, num_ue))
+        CH = self.create_pathloss(num_ue, num_sample) #shape (num_sample, num_ue, num_ue)
+        print(f'GENERATE_WGAUSSIAN: {type(CH)} - {CH.shape}')
+
         H = abs(CH)
         Y = self.batch_WMMSE(Pini, alpha, H, Pmax)
         Y2 = self.batch_WMMSE(Pini, alpha2, H, Pmax)
@@ -155,43 +187,42 @@ class Env():
                     adj.append([i, j])
         return adj
 
-    # def simple_greedy(self, X, AAA, label, num_user):
-    #     n = X.shape[0]
-    #     thd = int(np.sum(label) / n)
-    #     Y = np.zeros((n, num_user))
-    #     for ii in range(n):
-    #         alpha = AAA[ii, :]
-    #         H_diag = alpha * np.square(np.diag(X[ii, :, :]))
-    #         xx = np.argsort(H_diag)[::-1]
-    #         for jj in range(thd):
-    #             Y[ii, xx[jj]] = 1
-    #     return Y
-    #
-    # def np_sum_rate(self, H, p, alpha, var_noise):
-    #     H = np.expand_dims(H, axis=-1)
-    #     K = H.shape[1]
-    #     N = H.shape[-1]
-    #     p = p.reshape((-1, K, 1, N))
-    #     rx_power = np.multiply(H, p)
-    #     rx_power = np.sum(rx_power, axis=-1)
-    #     rx_power = np.square(abs(rx_power))
-    #     mask = np.eye(K)
-    #     valid_rx_power = np.sum(np.multiply(rx_power, mask), axis=1)
-    #     interference = np.sum(np.multiply(rx_power, 1 - mask), axis=1) + var_noise
-    #     rate = np.log(1 + np.divide(valid_rx_power, interference))
-    #     w_rate = np.multiply(alpha, rate)
-    #     sum_rate = np.mean(np.sum(w_rate, axis=1))
-    #     return sum_rate
-    #
-    # def show_result_graph(self, num_ue, num_test, var_db, num_client):
-    #     seed = testseed
-    #     num_users = num_user * num_client
-    #     num_tests = num_test * num_client
-    #     var_noise = 1 / 10 ** (var_db / 10)
-    #     Xtest, Ytest, Atest, Ytest2 = generate_wGaussian(num_users, num_tests, var_noise, seed)
-    #     baseline_Y = self.simple_greedy(Xtest, Atest, Ytest, num_users)
-    #     print(f'Greedy - Baseline Methods:  {self.np_sum_rate(Xtest, baseline_Y, Atest, var_noise)}')
-    #     print(f'WMMSE - Weighted Case:      {self.np_sum_rate(Xtest.transpose(0, 2, 1), Ytest, Atest, var_noise)}')
-    #     print(f'WMMSE - Unweighted Case:    {self.np_sum_rate(Xtest.transpose(0, 2, 1), Ytest2, Atest, var_noise)}')
+    def simple_greedy(self, X, AAA, label, num_user):
+        n = X.shape[0]
+        thd = int(np.sum(label) / n)
+        Y = np.zeros((n, num_user))
+        for ii in range(n):
+            alpha = AAA[ii, :]
+            H_diag = alpha * np.square(np.diag(X[ii, :, :]))
+            xx = np.argsort(H_diag)[::-1]
+            for jj in range(thd):
+                Y[ii, xx[jj]] = 1
+        return Y
+
+    def np_sum_rate(self, H, p, alpha):
+        H = np.expand_dims(H, axis=-1)
+        K = H.shape[1]
+        N = H.shape[-1]
+        p = p.reshape((-1, K, 1, N))
+        rx_power = np.multiply(H, p)
+        rx_power = np.sum(rx_power, axis=-1)
+        rx_power = np.square(abs(rx_power))
+        mask = np.eye(K)
+        valid_rx_power = np.sum(np.multiply(rx_power, mask), axis=1)
+        interference = np.sum(np.multiply(rx_power, 1 - mask), axis=1) + self.var_noise
+        rate = np.log(1 + np.divide(valid_rx_power, interference))
+        w_rate = np.multiply(alpha, rate)
+        sum_rate = np.mean(np.sum(w_rate, axis=1))
+        return sum_rate
+
+    def show_result_graph(self):
+        seed = 2017
+        num_users = sum(self.num_ue_case1)
+        num_tests = self.num_test * self.num_ap
+        Xtest, Ytest, Atest, Ytest2 = self.generate_wGaussian(num_users, num_tests)
+        baseline_Y = self.simple_greedy(Xtest, Atest, Ytest, num_users)
+        print(f'Greedy - Baseline Methods:  {self.np_sum_rate(Xtest, baseline_Y, Atest)}')
+        print(f'WMMSE - Weighted Case:      {self.np_sum_rate(Xtest.transpose(0, 2, 1), Ytest, Atest )}')
+        print(f'WMMSE - Unweighted Case:    {self.np_sum_rate(Xtest.transpose(0, 2, 1), Ytest2, Atest)}')
 
 

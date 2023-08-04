@@ -23,10 +23,9 @@ class Client(object):
         self.device = args.device
         self.id = id  # integer
         self.save_folder_name = args.save_folder_name
-
+        self.num_train = args.num_train
+        self.num_test = args.num_test
         self.num_classes = args.num_classes
-        self.train_samples = train_samples
-        self.test_samples = test_samples
         self.batch_size = args.batch_size
         self.learning_rate = args.local_learning_rate
         self.local_steps = args.local_steps
@@ -44,7 +43,7 @@ class Client(object):
         self.send_time_cost = {'num_rounds': 0, 'total_cost': 0.0}
         self.privacy = args.privacy
         self.dp_sigma = args.dp_sigma
-        self.sample_rate = self.batch_size / self.train_samples
+        self.sample_rate = self.batch_size / self.num_train
         self.optimizer = torch.optim.Adam(self.model.parameters(), lr=self.learning_rate)
         self.learning_rate_scheduler = torch.optim.lr_scheduler.StepLR(
             optimizer=self.optimizer,
@@ -54,8 +53,8 @@ class Client(object):
         self.train_data_case1 = env.create_graph_data(self.id, is_train = True, case = 1)
         self.test_data_case1 = env.create_graph_data(self.id, is_train=False, case=1)
         self.num_ue_case1 = len(self.train_data_case1[0].x)
-        self.num_train = args.num_train
-        self.num_test = args.num_test
+        self.var_noise = env.var_noise
+
 
 
     def load_train_data(self, batch_size=None):
