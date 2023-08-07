@@ -106,6 +106,7 @@ if __name__ == "__main__":
     parser.add_argument('-thnoise', "--ther_noise", type=float, default=20000000 * 10 ** (-17.4) * 10 ** -3)
     parser.add_argument('-d0', "--distance_0", type=float, default=0.01, help="distance_0 in km")
     parser.add_argument('-d1', "--distance_1", type=float, default=0.05, help="distance_1 in km")
+
     parser.add_argument('-n', "--N", type=int, default=50)
 
     args = parser.parse_args()
