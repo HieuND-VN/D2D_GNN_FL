@@ -27,8 +27,8 @@ class FedAvg(Server):
             self.selected_clients = self.select_clients()
             self.send_models()
             if i%self.eval_gap == 0:
-                print(f"-------------Round number: {i}-------------")
-                print("\nEvaluate global model")
+                print(f"\n-------------Round number: {i}-------------")
+                print("Evaluate global model")
                 self.evaluate()
             for m, client in enumerate(self.selected_clients):
                 client.train()
@@ -40,7 +40,7 @@ class FedAvg(Server):
             self.Budget.append(time.time() - s_t)
             print('>'*10, 'time cost: ', self.Budget[-1])
 
-        print(f'Best result: -Train: {max(self.train_loss_save)*-1} -Test: {max(self.test_loss_save)*-1}')
+        print(f'Best result: -Train: {min(self.train_loss_save)} -Test: {min(self.test_loss_save)}')
 
         self.illustrate()
 

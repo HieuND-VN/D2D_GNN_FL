@@ -224,7 +224,7 @@ class Server(object):
         self.test_loss_save.append(test_loss*-1)
 
     def print_(self, test_acc, test_auc, train_loss):
-        print("Average Test Accurancy: {:.4f}".format(test_acc))
+        print("Average Test Accuracy: {:.4f}".format(test_acc))
         print("Average Test AUC: {:.4f}".format(test_auc))
         print("Average Train Loss: {:.4f}".format(train_loss))
 
