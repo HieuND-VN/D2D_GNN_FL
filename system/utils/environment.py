@@ -46,6 +46,9 @@ class Env():
         self.Pd = 1 / self.ther_noise
         self.Pu = self.Pd
 
+        self.greedy = []
+        self.weighted_case = []
+        self.unweighted_case = []
     def env_print(self):
         print("===========================System Model======================================")
         print(f"Number of mobile users in each client (each cell): {self.num_ue_case1}")
@@ -101,6 +104,8 @@ class Env():
     def proc_data(self, num_sample, num_ue):
         data_list = []
         X, Y, A, Y2 = self.generate_wGaussian(num_ue, num_sample)
+        # print(f'SHAPE OF X: [{X.shape}] --- [{Y.shape}] --- [{A.shape}]')
+        # print(f'X[0]: {X[0]}')
         cg = self.get_cg(num_ue)
         for sample in range(num_sample):
             data = self.build_graph(X[sample], A[sample], cg, num_ue)
@@ -108,6 +113,9 @@ class Env():
         return data_list
 
     def build_graph(self, H, A, adj, num_ue):
+        # print(f'Shape X[sample]: {H.shape}')
+
+        # print(f'Shape A[sample]: {A.shape}')
         x1 = np.expand_dims(np.diag(H), axis=1)
         x2 = np.expand_dims(A, axis=1)
         x3 = np.ones((num_ue, 1))
@@ -137,10 +145,10 @@ class Env():
         # CH = 1 / np.sqrt(2) * (
         #             np.random.rand(num_sample, num_ue, num_ue) + 1j * np.random.rand(num_sample, num_ue, num_ue))
         CH = self.create_pathloss(num_ue, num_sample) #shape (num_sample, num_ue, num_ue)
-        print(f'GENERATE_WGAUSSIAN: {type(CH)} - {CH.shape}')
 
         H = abs(CH)
         Y = self.batch_WMMSE(Pini, alpha, H, Pmax)
+        # print(f'-------> {Y.shape}')
         Y2 = self.batch_WMMSE(Pini, alpha2, H, Pmax)
         return H, Y, alpha, Y2
 
@@ -217,12 +225,16 @@ class Env():
 
     def show_result_graph(self):
         seed = 2017
-        num_users = sum(self.num_ue_case1)
-        num_tests = self.num_test * self.num_ap
-        Xtest, Ytest, Atest, Ytest2 = self.generate_wGaussian(num_users, num_tests)
-        baseline_Y = self.simple_greedy(Xtest, Atest, Ytest, num_users)
-        print(f'Greedy - Baseline Methods:  {self.np_sum_rate(Xtest, baseline_Y, Atest)}')
-        print(f'WMMSE - Weighted Case:      {self.np_sum_rate(Xtest.transpose(0, 2, 1), Ytest, Atest )}')
-        print(f'WMMSE - Unweighted Case:    {self.np_sum_rate(Xtest.transpose(0, 2, 1), Ytest2, Atest)}')
+        for i in range(self.num_ap):
+            num_users = self.num_ue_case1[i]
+            num_tests = self.num_test
+            Xtest, Ytest, Atest, Ytest2 = self.generate_wGaussian(num_users, num_tests)
+            baseline_Y = self.simple_greedy(Xtest, Atest, Ytest, num_users)
+            self.greedy.append(self.np_sum_rate(Xtest, baseline_Y, Atest))
+            self.weighted_case.append(self.np_sum_rate(Xtest.transpose(0, 2, 1), Ytest, Atest))
+            self.unweighted_case.append(self.np_sum_rate(Xtest.transpose(0, 2, 1), Ytest2, Atest))
+        print(f'Greedy - Baseline Methods:  {sum(self.greedy)}')
+        print(f'WMMSE - Weighted Case:      {sum(self.weighted_case)}')
+        print(f'WMMSE - Unweighted Case:    {sum(self.unweighted_case)}')
 
 

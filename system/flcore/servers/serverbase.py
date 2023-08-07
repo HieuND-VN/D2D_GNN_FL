@@ -256,7 +256,7 @@ class Server(object):
 
     def illustrate(self):
         x = np.arange(1, self.global_rounds+1)
-        SumRateMMSEplot = np.full_like(x,1)*10.4
+        SumRateMMSEplot = np.full_like(x,1)*7.5
         plt.plot(self.train_loss_save, label = 'Training')
         plt.plot(self.test_loss_save, label='Testing')
         plt.plot(x,SumRateMMSEplot, label = 'Optimization')
