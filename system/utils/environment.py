@@ -97,7 +97,9 @@ class Env():
             num_ue = self.num_ue_case5
         elif case == 6:
             num_ue = self.num_ue_case5
-
+        '''
+        Old scenario
+        '''
         data_client = self.proc_data(num_sample, num_ue)
         return data_client
 
