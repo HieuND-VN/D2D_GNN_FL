@@ -50,8 +50,8 @@ class Client(object):
             step_size=args.step_size,
             gamma=args.learning_rate_decay_gamma)
         self.learning_rate_decay = args.learning_rate_decay
-        self.train_data_case1 = env.create_graph_data(self.id, is_train = True, case =1)
-        self.test_data_case1 = env.create_graph_data(self.id, is_train=False, case=1)
+        self.train_data_case1 = env.create_graph_data(self.id, is_train = True, case = 2)
+        self.test_data_case1 = env.create_graph_data(self.id, is_train=False, case=2)
         self.num_ue_case1 = env.num_ue_case1[self.id]
         self.var_noise = env.var_noise
 
@@ -89,7 +89,7 @@ class Client(object):
             data = data.to(self.device)
             with torch.no_grad():
                 out = self.model(data)
-                # print(f'TEST METRICS: {out.shape}')
+                print(f'TEST METRICS: {out.shape}')
                 loss = self.sr_loss(data, out, self.num_ue_case1)
                 total_loss += loss.item() * data.num_graphs
         return total_loss / self.num_test
