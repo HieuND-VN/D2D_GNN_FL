@@ -13,15 +13,18 @@ class Env():
         # Device information
         self.num_ap = args.num_clients
         self.num_ue_case1 = []
-        for i in range(self.num_ap):
-            self.num_ue_case1.append(random.randrange(args.num_ue_min, args.num_ue_max + 1, 10))
-        # print(f'NUMBER OF ENV: {self.num_ue_case1}')
-        self.num_ue_case2 = args.num_ue_min  # 10
-        self.num_ue_case3 = 20
-        self.num_ue_case4 = 30
-        self.num_ue_case5 = 40
-        self.num_ue_case6 = 50
-        self.num_ue_case7 = args.num_ue_max  # 60
+        # for i in range(self.num_ap):
+        #     self.num_ue_case1.append(random.randrange(args.num_ue_min, args.num_ue_max + 1, 10))
+        # self.num_ue_case2 = args.num_ue_min  # 10
+        # self.num_ue_case3 = 20
+        # self.num_ue_case4 = 30
+        # self.num_ue_case5 = 40
+        # self.num_ue_case6 = 50
+        # self.num_ue_case7 = args.num_ue_max  # 60
+        self.num_ue_train = np.arrange(args.num_ue_min, args.num_ue_max+1, 10) # [10,20,30,40,50,60,70,80,90,100]
+        self.num_ue_test_10 = 10
+        self.num_ue_test_50 = 50
+        self.num_ue_test_100 = 100
         self.diameter = args.diameter
 
 
@@ -78,25 +81,45 @@ class Env():
 
 
 
-    def create_graph_data(self, id, is_train=False, case=1):
+    def create_graph_data(self, id, is_train=False):
         # select num_sample
         if is_train:
             num_sample = self.num_train
         else:
             num_sample = self.num_test
         # select num_ue in each cell
-        if case == 1:
-            num_ue = self.num_ue_case1[id]
-        elif case == 2:
-            num_ue = self.num_ue_case2
-        elif case == 3:
-            num_ue = self.num_ue_case3
-        elif case == 4:
-            num_ue = self.num_ue_case4
-        elif case == 5:
-            num_ue = self.num_ue_case5
-        elif case == 6:
-            num_ue = self.num_ue_case5
+        # if case == 1:
+        #     num_ue = self.num_ue_case1[id]
+        # elif case == 2:
+        #     num_ue = self.num_ue_case2
+        # elif case == 3:
+        #     num_ue = self.num_ue_case3
+        # elif case == 4:
+        #     num_ue = self.num_ue_case4
+        # elif case == 5:
+        #     num_ue = self.num_ue_case5
+        # elif case == 6:
+        #     num_ue = self.num_ue_case5
+        '''
+        This part is programmed for the case number of UE in each cell is randomly chosen. 
+        But now, the number of clients (cells) and the number of UEs in each cell are fixed (=10)
+        The number of UEs in each cell are [10,20,30,40,50,60,70,80,90,100] so client.id == 0 will have 10 UEs, id ==1 has 20 Ues respectively.
+        --> after training, each client has its own loss value:
+         - loss_client_0                - loss_client_5
+         - loss_client_1                - loss_client_6
+         - loss_client_2                - loss_client_7
+         - loss_client_3                - loss_client_8
+         - loss_client_4                - loss_client_9
+        --> after propagation process, each client has its own parameters set.
+         - omega_0                      - omega_5
+         - omega_1                      - omega_6
+         - omega_2                      - omega_7
+         - omega_3                      - omega_8
+         - omega_4                      - omega_9
+        The number of UEs in each cell will be used to create train data for each cell.
+        The performance of global model parameter will be estimated by test datasets whose number of UEs is 10-50-100 respectively.
+        --> We will have 3 loss value loss_10, loss_50, loss_100
+        '''
 
         data_client = self.proc_data(num_sample, num_ue)
         return data_client
@@ -104,8 +127,6 @@ class Env():
     def proc_data(self, num_sample, num_ue):
         data_list = []
         X, Y, A, Y2 = self.generate_wGaussian(num_ue, num_sample)
-        # print(f'SHAPE OF X: [{X.shape}] --- [{Y.shape}] --- [{A.shape}]')
-        # print(f'X[0]: {X[0]}')
         cg = self.get_cg(num_ue)
         for sample in range(num_sample):
             data = self.build_graph(X[sample], A[sample], cg, num_ue)
@@ -233,7 +254,7 @@ class Env():
             self.greedy.append(self.np_sum_rate(Xtest, baseline_Y, Atest))
             self.weighted_case.append(self.np_sum_rate(Xtest.transpose(0, 2, 1), Ytest, Atest))
             self.unweighted_case.append(self.np_sum_rate(Xtest.transpose(0, 2, 1), Ytest2, Atest))
-        print(f'Greedy - Baseline Methods:  {sum(self.greedy)}')
+        print(f'Greedy - Baseline Methods:  {sum(self.greedy)} - {self.greedy[0]} - {self.greedy[1]}')
         print(f'WMMSE - Weighted Case:      {sum(self.weighted_case)}')
         print(f'WMMSE - Unweighted Case:    {sum(self.unweighted_case)}')
 

@@ -22,7 +22,7 @@ torch.manual_seed(0)
 def run(args, env):
     time_list = []
     reporter = MemReporter()
-
+    env.show_result_graph()
     for i in range(args.prev, args.times):
         print(f"\n============= Running time: {i}th =============")
         print("Creating server and clients ...")
@@ -34,7 +34,7 @@ def run(args, env):
         time_list.append(time.time() - start)
 
     print(f"\n>>>>>>>>>>>>Average time cost: {round(np.average(time_list), 2)}s.")
-    env.show_result_graph()
+    # env.show_result_graph()
     # Global average
     # show_result_graph(args.num_user, args.test_samples, args.var_db, args.num_clients)
 
@@ -63,7 +63,7 @@ if __name__ == "__main__":
                         help="Ratio of clients per round")
     parser.add_argument('-rjr', "--random_join_ratio", type=bool, default=False,
                         help="Random ratio of clients per round")
-    parser.add_argument('-nc', "--num_clients", type=int, default=2,
+    parser.add_argument('-nc', "--num_clients", type=int, default=10,
                         help="Total number of clients")
     parser.add_argument('-pv', "--prev", type=int, default=0,
                         help="Previous Running times")
@@ -146,3 +146,6 @@ if __name__ == "__main__":
     env = Env(args)
     env.env_print()
     run(args, env)
+
+
+
