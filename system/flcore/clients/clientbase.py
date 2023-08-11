@@ -50,22 +50,13 @@ class Client(object):
             step_size=args.step_size,
             gamma=args.learning_rate_decay_gamma)
         self.learning_rate_decay = args.learning_rate_decay
-        self.train_data_case1 = env.create_graph_data(self.id, is_train = True, case = 2)
-        self.test_data_case1 = env.create_graph_data(self.id, is_train=False, case=2)
-        self.num_ue_case1 = env.num_ue_case1[self.id]
+
+        self.num_ue = env.num_ue_array[self.id]
+        self.train_data_loader_client = env.create_graph_data_train(self.id)
+        self.test_data_loader_10 = env.create_graph_data_test(num_user = 10)
+        self.test_data_loader_50 = env.create_graph_data_test(num_user=50)
+        self.test_data_loader_100 = env.create_graph_data_test(num_user=100)
         self.var_noise = env.var_noise
-
-
-
-    def load_train_data(self, batch_size=None):
-        if batch_size == None:
-            batch_size = self.batch_size
-            return DataLoader(self.train_data_case1,batch_size, shuffle=True, num_workers=1)
-
-    def load_test_data(self, batch_size=None):
-        if batch_size == None:
-            batch_size = self.batch_size
-            return DataLoader(self.test_data_case1, batch_size, shuffle=False, num_workers=1)
 
     def set_parameters(self, model):
         for new_param, old_param in zip(model.parameters(), self.model.parameters()):
@@ -82,29 +73,61 @@ class Client(object):
             param.data = new_param.data.clone()
 
     def test_metrics(self):
-        testloaderfull = self.load_test_data()
+        # testloaderfull = self.load_test_data()
         self.model.eval()
+        total_loss_10 = 0
+        test_loss_10 = 0
+        total_loss_50 = 0
+        test_loss_50 = 0
+        total_loss_100 = 0
+        test_loss_100 = 0
         total_loss = 0
-        for data in testloaderfull:
+        test_loss = 0
+        for data in self.test_data_loader_client:
             data = data.to(self.device)
             with torch.no_grad():
                 out = self.model(data)
-                print(f'TEST METRICS: {out.shape}')
-                loss = self.sr_loss(data, out, self.num_ue_case1)
+                loss = self.sr_loss(data, out, self.num_ue)
                 total_loss += loss.item() * data.num_graphs
-        return total_loss / self.num_test
+        test_loss = total_loss / self.num_test
+        for data_10 in self.test_data_loader_10:
+            data_10 = data_10.to(self.device)
+            with torch.no_grad():
+                out_10 = self.model(data_10)
+                loss_10 = self.sr_loss(data_10, out_10, 10)
+                total_loss_10 += loss_10.item() * data_10.num_graphs
+        test_loss_10 = total_loss_10 / self.num_test
+
+        for data_50 in self.test_data_loader_50:
+            data_50 = data_50.to(self.device)
+            with torch.no_grad():
+                out_50 = self.model(data_50)
+                loss_50 = self.sr_loss(data_50, out_50, 50)
+                total_loss_50 += loss_50.item() * data_50.num_graphs
+        test_loss_50 = total_loss_50 / self.num_test
+
+        for data_100 in self.test_data_loader_100:
+            data_100 = data_100.to(self.device)
+            with torch.no_grad():
+                out_100 = self.model(data_100)
+                loss_100 = self.sr_loss(data_100, out_100, 100)
+                total_loss_100 += loss_100.item() * data_100.num_graphs
+        test_loss_100 = total_loss_100 / self.num_test
+
+        return test_loss, test_loss_10, test_loss_50, test_loss_100
 
     def train_metrics(self):
-        trainloaderfull = self.load_train_data()
         self.model.eval()
         total_loss = 0
-        for data in trainloaderfull:
+        train_client_loss = 0
+        for data in self.train_data_loader_client:
             data = data.to(self.device)
             with torch.no_grad():
                 out = self.model(data)
-                loss = self.sr_loss(data, out, self.num_ue_case1)
+                loss = self.sr_loss(data, out, self.num_ue)
                 total_loss += loss.item() * data.num_graphs
-        return total_loss / self.num_train
+        train_client_loss = total_loss / self.num_train
+        return train_client_loss
 
     def save_item(self, item, item_name, item_path=None):
         if item_path == None:

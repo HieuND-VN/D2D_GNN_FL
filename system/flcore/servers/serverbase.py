@@ -39,10 +39,13 @@ class Server(object):
         self.uploaded_ids = []
         self.uploaded_models = []
 
-        self.rs_test_acc = []
-        self.rs_test_loss = []
-        self.rs_test_auc = []
-        self.rs_train_loss = []
+        self.rs_test_acc        = []
+        self.rs_test_loss_client   = []
+        self.rs_test_loss_10       = []
+        self.rs_test_loss_50       = []
+        self.rs_test_loss_100      = []
+        self.rs_test_auc        = []
+        self.rs_train_loss      = []
 
         self.times = times
         self.eval_gap = args.eval_gap
@@ -51,7 +54,11 @@ class Server(object):
         self.send_slow_rate = args.send_slow_rate
 
         self.train_loss_save = []
-        self.test_loss_save = []
+        self.test_loss_client_save = []
+        self.test_loss_client_10 = []
+        self.test_loss_client_50 = []
+        self.test_loss_client_100 = []
+
 
     def set_clients(self, args, clientObj, env):
         for i, train_slow, send_slow in zip(range(self.num_clients), self.train_slow_clients, self.send_slow_clients):
@@ -181,11 +188,17 @@ class Server(object):
 
     def test_metrics(self):
         loss_test = []
+        loss_test_10 = []
+        loss_test_50 = []
+        loss_test_100 = []
         for c in self.clients:
-            loss = c.test_metrics()
+            loss, loss_10, loss_50, loss_100 = c.test_metrics()
             loss_test.append(loss)
+            loss_test_10.append(loss_10)
+            loss_test_50.append(loss_50)
+            loss_test_100.append(loss_100)
         ids = [c.id for c in self.clients]
-        return ids, loss_test
+        return ids, loss_test, loss_test_10, loss_test_50, loss_test_100
 
 
     def train_metrics(self):
@@ -201,10 +214,16 @@ class Server(object):
     def evaluate(self, acc=None, loss=None):
         stats_test = self.test_metrics()
         stats_train = self.train_metrics()
-        test_loss = sum(stats_test[1]) / int(self.num_clients)
+        test_loss_client = sum(stats_test[1]) / int(self.num_clients)
+        test_loss_10 = sum(stats_test[2]) / int(self.num_clients)
+        test_loss_50 = sum(stats_test[3]) / int(self.num_clients)
+        test_loss_100 = sum(stats_test[4]) / int(self.num_clients)
         train_loss = sum(stats_train[1]) / int(self.num_clients)
         if acc == None:
-            self.rs_test_loss.append(test_loss)
+            self.rs_test_loss_client.append(test_loss_client)
+            self.rs_test_loss_10.append(test_loss_10)
+            self.rs_test_loss_50.append(test_loss_50)
+            self.rs_test_loss_100.append(test_loss_100)
         else:
             acc.append(test_loss)
 
@@ -219,14 +238,20 @@ class Server(object):
 
             # print(f'The total number of parameters in all clients: {count*self.num_clients}')
         print("Averaged Train Loss: {:.4f}".format(train_loss*-1))
-        print("Averaged Test Loss: {:.4f}".format(test_loss*-1))
+        print("Averaged Test Loss LOCAL: {:.4f}".format(test_loss_client*-1))
+        print("Averaged Test Loss 10: {:.4f}".format(test_loss_10 * -1))
+        print("Averaged Test Loss 50: {:.4f}".format(test_loss_50 * -1))
+        print("Averaged Test Loss 100: {:.4f}".format(test_loss_100 * -1))
         self.train_loss_save.append(train_loss*-1)
-        self.test_loss_save.append(test_loss*-1)
+        self.test_loss_client_save.append(test_loss_client*-1)
+        self.test_loss_10_save.append(test_loss_10 * -1)
+        self.test_loss_50_save.append(test_loss_50 * -1)
+        self.test_loss_100_save.append(test_loss_100 * -1)
 
-    def print_(self, test_acc, test_auc, train_loss):
-        print("Average Test Accuracy: {:.4f}".format(test_acc))
-        print("Average Test AUC: {:.4f}".format(test_auc))
-        print("Average Train Loss: {:.4f}".format(train_loss))
+    # def print_(self, test_acc, test_auc, train_loss):
+    #     print("Average Test Accuracy: {:.4f}".format(test_acc))
+    #     print("Average Test AUC: {:.4f}".format(test_auc))
+    #     print("Average Train Loss: {:.4f}".format(train_loss))
 
     def check_done(self, acc_lss, top_cnt=None, div_value=None):
         for acc_ls in acc_lss:
@@ -256,9 +281,12 @@ class Server(object):
 
     def illustrate(self):
         x = np.arange(1, self.global_rounds+1)
-        SumRateMMSEplot = np.full_like(x,1)*7.5
+        # SumRateMMSEplot = np.full_like(x,1)*7.5
         plt.plot(self.train_loss_save, label = 'Training')
-        plt.plot(self.test_loss_save, label='Testing')
-        plt.plot(x,SumRateMMSEplot, label = 'Optimization')
+        plt.plot(self.test_loss_client_save, label='Testing N = local number')
+        plt.plot(self.test_loss_10_save, label='Testing N = 10')
+        plt.plot(self.test_loss_50_save, label='Testing N = 50')
+        plt.plot(self.test_loss_100_save, label='Testing N = 100')
+        # plt.plot(x,SumRateMMSEplot, label = 'Optimization')
         plt.legend()
         plt.show()

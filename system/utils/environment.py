@@ -2,6 +2,7 @@ import numpy as np
 import random
 import torch
 from torch_geometric.data import Data
+from torch_geometric.loader import DataLoader
 
 
 
@@ -9,20 +10,11 @@ class Env():
     def __init__(self, args):
         self.num_train = args.num_train
         self.num_test = args.num_test
+        self.batch_size = args.batch_size
 
         # Device information
-        self.num_ap = args.num_clients
+        self.num_clients = args.num_clients
         self.num_ue_array = np.arange(args.num_ue_min, args.num_ue_max+1, 10)
-        # self.num_ue_case1 = []
-        # for i in range(self.num_ap):
-        #     self.num_ue_case1.append(random.randrange(args.num_ue_min, args.num_ue_max + 1, 10))
-        # # print(f'NUMBER OF ENV: {self.num_ue_case1}')
-        # self.num_ue_case2 = args.num_ue_min  # 10
-        # self.num_ue_case3 = 20
-        # self.num_ue_case4 = 30
-        # self.num_ue_case5 = 40
-        # self.num_ue_case6 = 50
-        # self.num_ue_case7 = args.num_ue_max  # 60
         self.diameter = args.diameter
 
 
@@ -38,8 +30,6 @@ class Env():
         self.ther_noise = args.ther_noise
         self.d0 = args.distance_0
         self.d1 = args.distance_1
-        self.is_train = True
-        self.batch_size = args.batch_size
 
         self.aL = (1.1 * np.log10(self.freq) - 0.7) * self.hm - (1.56 * np.log10(self.freq) - 0.8)
         self.L = 46.3 + 33.9 * np.log10(self.freq) - 13.82 * np.log10(self.ha) - self.aL
@@ -50,61 +40,28 @@ class Env():
         self.greedy = []
         self.weighted_case = []
         self.unweighted_case = []
-        self.test_data_loader_10 = self.create_graph_data_test(num_user = 10)
-        self.test_data_loader_50 = self.create_graph_data_test(num_user = 50)
-        self.test_data_loader_10 = self.create_graph_data_test(num_user = 100)
     def env_print(self):
         print("===========================System Model======================================")
-        print(f"Number of mobile users in each client (each cell): {self.num_ue_case1}")
+        print(f"Number of mobile users in each client (each cell): {self.num_ue_array}")
         print(f"Bandwidth of the channel: {self.bandwidth} MHz")
         print(f"Frequency of the channel: {self.freq}")
-        print("=========================================================================    ====")
+        print("=============================================================================")
 
-    def create_pathloss(self, num_ue, num_sample):
-        # pathloss_client = np.zeros((num_sample, 1, num_ue))
-        pathloss_client = np.zeros((num_sample, num_ue, num_ue))
-        for ite in range(num_sample):
-            AP = np.random.uniform(0, 0, size = (num_ue, 2))
-            UE = np.random.uniform(-1,1, size = (num_ue, 2))
-            pathloss_sample = np.zeros((num_ue, num_ue))
-            for m in range(num_ue):
-                for k in range(num_ue):
-                    dist = np.linalg.norm(AP[m] - UE[k, :])
-                    if dist < self.d0:
-                        PL = -self.L - 35 * np.log10(self.d1) + 20 * np.log10(self.d1) - 20 * np.log10(self.d0)
-                    elif dist >= self.d0 and dist <= self.d1:
-                        PL = -self.L - 35 * np.log10(self.d1) + 20 * np.log10(self.d1) - 20 * np.log10(dist)
-                    else:
-                        PL = -self.L - 35 * np.log10(dist) + np.random.normal(0,1) * 7
-
-                    pathloss_sample[m, k] = 10 ** (PL / 10) * self.Pd
-            pathloss_client[ite,:,:] = pathloss_sample
-        return pathloss_client
+    def create_graph_data_train(self, id):
+        num_sample = self.num_train
+        num_ue = self.num_ue_array[id]
+        data_client = self.proc_data(num_sample, num_ue)
+        data_loader = DataLoader(data_client, batch_size = self.batch_size, shuffle = True, num_workers = 1)
+        return data_loader
 
     def create_graph_data_test(self, num_user):
         num_ue = num_user
         num_sample = self.num_test
         data_client = self.proc_data(num_sample, num_ue)
-        return data_client
+        data_loader = DataLoader(data_client, batch_size=self.batch_size, shuffle=False, num_workers=1)
+        return data_loader
 
-    def create_graph_data_train(self, id):
-        # select num_sample
-        num_sample = self.num_train
-        num_ue = self.num_ue_array[id]
-        # select num_ue in each cell
-        # if case == 1:
-        #     num_ue = self.num_ue_case1[id]
-        # elif case == 2:
-        #     num_ue = self.num_ue_case2
-        # elif case == 3:
-        #     num_ue = self.num_ue_case3
-        # elif case == 4:
-        #     num_ue = self.num_ue_case4
-        # elif case == 5:
-        #     num_ue = self.num_ue_case5
-        # elif case == 6:
-        #     num_ue = self.num_ue_case5
-        '''
+    '''
         Old scenario: 2 cells (2 clients) and the number of UEs in each client is randomly chosen from 10 to 60.
         New scenario: the number of cells and number of UEs in each cell is fixed from the initial stage.
             10 clients, the number of UEs in each clients is [10,20,30,40,50,60,70,80,90,100] respectively.
@@ -128,25 +85,49 @@ class Env():
                 - test_loss_50                      - centralized_train50_test_10 / centralized_train50_test_50 / centralized_train50_test_100
                 - test_loss_100                     - centralized_train100_test_10 / centralized_train100_test_50 / centralized_train100_test_100
             We hope that with the same number of epochs (in FL case, local iteration =1), FL_GNN has approximate performance with centralized GNN case
-        '''
-        data_client = self.proc_data(num_sample, num_ue)
-        return data_client
+    '''
 
     def proc_data(self, num_sample, num_ue):
         data_list = []
         X, Y, A, Y2 = self.generate_wGaussian(num_ue, num_sample)
-        # print(f'SHAPE OF X: [{X.shape}] --- [{Y.shape}] --- [{A.shape}]')
-        # print(f'X[0]: {X[0]}')
         cg = self.get_cg(num_ue)
         for sample in range(num_sample):
             data = self.build_graph(X[sample], A[sample], cg, num_ue)
             data_list.append(data)
         return data_list
 
-    def build_graph(self, H, A, adj, num_ue):
-        # print(f'Shape X[sample]: {H.shape}')
+    def generate_wGaussian(self, num_ue, num_sample):
+        Pmax = 1
+        Pini = Pmax * np.ones((num_sample, num_ue, 1))
+        alpha = np.random.rand(num_sample, num_ue)
+        alpha2 = np.ones((num_sample, num_ue))
+        CH = self.create_pathloss(num_ue, num_sample)
+        H = abs(CH)
+        Y = self.batch_WMMSE(Pini, alpha, H, Pmax)
+        Y2 = self.batch_WMMSE(Pini, alpha2, H, Pmax)
+        return H, Y, alpha, Y2
 
-        # print(f'Shape A[sample]: {A.shape}')
+    def create_pathloss(self, num_ue, num_sample):
+        pathloss_client = np.zeros((num_sample, num_ue, num_ue))
+        for ite in range(num_sample):
+            AP = np.random.uniform(0, 0, size = (num_ue, 2))
+            UE = np.random.uniform(-1,1, size = (num_ue, 2))
+            pathloss_sample = np.zeros((num_ue, num_ue))
+            for m in range(num_ue):
+                for k in range(num_ue):
+                    dist = np.linalg.norm(AP[m] - UE[k, :])
+                    if dist < self.d0:
+                        PL = -self.L - 35 * np.log10(self.d1) + 20 * np.log10(self.d1) - 20 * np.log10(self.d0)
+                    elif dist >= self.d0 and dist <= self.d1:
+                        PL = -self.L - 35 * np.log10(self.d1) + 20 * np.log10(self.d1) - 20 * np.log10(dist)
+                    else:
+                        PL = -self.L - 35 * np.log10(dist) + np.random.normal(0,1) * 7
+
+                    pathloss_sample[m, k] = 10 ** (PL / 10) * self.Pd
+            pathloss_client[ite,:,:] = pathloss_sample
+        return pathloss_client
+
+    def build_graph(self, H, A, adj, num_ue):
         x1 = np.expand_dims(np.diag(H), axis=1)
         x2 = np.expand_dims(A, axis=1)
         x3 = np.ones((num_ue, 1))
@@ -167,21 +148,6 @@ class Env():
                     y=y,
                     pos=pos)
         return data
-
-    def generate_wGaussian(self, num_ue, num_sample):
-        Pmax = 1
-        Pini = Pmax * np.ones((num_sample, num_ue, 1))
-        alpha = np.random.rand(num_sample, num_ue)
-        alpha2 = np.ones((num_sample, num_ue))
-        # CH = 1 / np.sqrt(2) * (
-        #             np.random.rand(num_sample, num_ue, num_ue) + 1j * np.random.rand(num_sample, num_ue, num_ue))
-        CH = self.create_pathloss(num_ue, num_sample) #shape (num_sample, num_ue, num_ue)
-
-        H = abs(CH)
-        Y = self.batch_WMMSE(Pini, alpha, H, Pmax)
-        # print(f'-------> {Y.shape}')
-        Y2 = self.batch_WMMSE(Pini, alpha2, H, Pmax)
-        return H, Y, alpha, Y2
 
     def batch_WMMSE(self, p_int, alpha, H, Pmax):
         N = p_int.shape[0]
@@ -256,7 +222,7 @@ class Env():
 
     def show_result_graph(self):
         seed = 2017
-        for i in range(self.num_ap):
+        for i in range(self.num_clients):
             num_users = self.num_ue_case1[i]
             num_tests = self.num_test
             Xtest, Ytest, Atest, Ytest2 = self.generate_wGaussian(num_users, num_tests)
@@ -267,5 +233,7 @@ class Env():
         print(f'Greedy - Baseline Methods:  {sum(self.greedy)}')
         print(f'WMMSE - Weighted Case:      {sum(self.weighted_case)}')
         print(f'WMMSE - Unweighted Case:    {sum(self.unweighted_case)}')
+
+
 
 

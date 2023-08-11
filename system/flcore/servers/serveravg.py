@@ -41,7 +41,19 @@ class FedAvg(Server):
             print('>'*10, 'time cost: ', self.Budget[-1])
 
         print(f'Best result: -Train: {min(self.train_loss_save)} -Test: {min(self.test_loss_save)}')
-
+        '''
+        Compare scenarios
+        1. FL train_loss and test loss (test_loss_10, test_loss_50, test_loss_100)
+        2. GNN case: 
+            2.1. train_10 and test_10, test_50, test_100
+            2.1. train_50 and test_10, test_50, test_100
+            2.1. train_100 and test_10, test_50, test_100
+            Compare with WMMSE optimization value
+        3. FL test loss compare with GNN centralize models
+            3.1. FL test_10 vs. train_10_test_10, train_50_test_10, train_100_test_10
+            3.2. FL test_50 vs. train_10_test_50, train_50_test_50, train_100_test_50
+            3.3. FL test_100 vs train_10_test_100, train_50_test_100, train_100_test_100
+        '''
         self.illustrate()
 
 
