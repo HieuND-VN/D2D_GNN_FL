@@ -12,16 +12,17 @@ class Env():
 
         # Device information
         self.num_ap = args.num_clients
-        self.num_ue_case1 = []
-        for i in range(self.num_ap):
-            self.num_ue_case1.append(random.randrange(args.num_ue_min, args.num_ue_max + 1, 10))
-        # print(f'NUMBER OF ENV: {self.num_ue_case1}')
-        self.num_ue_case2 = args.num_ue_min  # 10
-        self.num_ue_case3 = 20
-        self.num_ue_case4 = 30
-        self.num_ue_case5 = 40
-        self.num_ue_case6 = 50
-        self.num_ue_case7 = args.num_ue_max  # 60
+        self.num_ue_array = np.arange(args.num_ue_min, args.num_ue_max+1, 10)
+        # self.num_ue_case1 = []
+        # for i in range(self.num_ap):
+        #     self.num_ue_case1.append(random.randrange(args.num_ue_min, args.num_ue_max + 1, 10))
+        # # print(f'NUMBER OF ENV: {self.num_ue_case1}')
+        # self.num_ue_case2 = args.num_ue_min  # 10
+        # self.num_ue_case3 = 20
+        # self.num_ue_case4 = 30
+        # self.num_ue_case5 = 40
+        # self.num_ue_case6 = 50
+        # self.num_ue_case7 = args.num_ue_max  # 60
         self.diameter = args.diameter
 
 
@@ -49,56 +50,84 @@ class Env():
         self.greedy = []
         self.weighted_case = []
         self.unweighted_case = []
+        self.test_data_loader_10 = self.create_graph_data_test(num_user = 10)
+        self.test_data_loader_50 = self.create_graph_data_test(num_user = 50)
+        self.test_data_loader_10 = self.create_graph_data_test(num_user = 100)
     def env_print(self):
         print("===========================System Model======================================")
         print(f"Number of mobile users in each client (each cell): {self.num_ue_case1}")
         print(f"Bandwidth of the channel: {self.bandwidth} MHz")
         print(f"Frequency of the channel: {self.freq}")
-        print("=============================================================================")
+        print("=========================================================================    ====")
 
     def create_pathloss(self, num_ue, num_sample):
         # pathloss_client = np.zeros((num_sample, 1, num_ue))
         pathloss_client = np.zeros((num_sample, num_ue, num_ue))
         for ite in range(num_sample):
-            AP = np.zeros(2,)
+            AP = np.random.uniform(0, 0, size = (num_ue, 2))
             UE = np.random.uniform(-1,1, size = (num_ue, 2))
-            pathloss_sample = np.zeros((1, num_ue))
-            for k in range(num_ue):
-                dist = np.linalg.norm(AP - UE[k, :])
-                if dist < self.d0:
-                    PL = -self.L - 35 * np.log10(self.d1) + 20 * np.log10(self.d1) - 20 * np.log10(self.d0)
-                elif dist >= self.d0 and dist <= self.d1:
-                    PL = -self.L - 35 * np.log10(self.d1) + 20 * np.log10(self.d1) - 20 * np.log10(dist)
-                else:
-                    PL = -self.L - 35 * np.log10(dist) + np.random.normal(0,1) * 7
+            pathloss_sample = np.zeros((num_ue, num_ue))
+            for m in range(num_ue):
+                for k in range(num_ue):
+                    dist = np.linalg.norm(AP[m] - UE[k, :])
+                    if dist < self.d0:
+                        PL = -self.L - 35 * np.log10(self.d1) + 20 * np.log10(self.d1) - 20 * np.log10(self.d0)
+                    elif dist >= self.d0 and dist <= self.d1:
+                        PL = -self.L - 35 * np.log10(self.d1) + 20 * np.log10(self.d1) - 20 * np.log10(dist)
+                    else:
+                        PL = -self.L - 35 * np.log10(dist) + np.random.normal(0,1) * 7
 
-                pathloss_sample[0, k] = 10 ** (PL / 10) * self.Pd
+                    pathloss_sample[m, k] = 10 ** (PL / 10) * self.Pd
             pathloss_client[ite,:,:] = pathloss_sample
         return pathloss_client
 
+    def create_graph_data_test(self, num_user):
+        num_ue = num_user
+        num_sample = self.num_test
+        data_client = self.proc_data(num_sample, num_ue)
+        return data_client
 
-
-    def create_graph_data(self, id, is_train=False, case=1):
+    def create_graph_data_train(self, id):
         # select num_sample
-        if is_train:
-            num_sample = self.num_train
-        else:
-            num_sample = self.num_test
+        num_sample = self.num_train
+        num_ue = self.num_ue_array[id]
         # select num_ue in each cell
-        if case == 1:
-            num_ue = self.num_ue_case1[id]
-        elif case == 2:
-            num_ue = self.num_ue_case2
-        elif case == 3:
-            num_ue = self.num_ue_case3
-        elif case == 4:
-            num_ue = self.num_ue_case4
-        elif case == 5:
-            num_ue = self.num_ue_case5
-        elif case == 6:
-            num_ue = self.num_ue_case5
+        # if case == 1:
+        #     num_ue = self.num_ue_case1[id]
+        # elif case == 2:
+        #     num_ue = self.num_ue_case2
+        # elif case == 3:
+        #     num_ue = self.num_ue_case3
+        # elif case == 4:
+        #     num_ue = self.num_ue_case4
+        # elif case == 5:
+        #     num_ue = self.num_ue_case5
+        # elif case == 6:
+        #     num_ue = self.num_ue_case5
         '''
-        Old scenario
+        Old scenario: 2 cells (2 clients) and the number of UEs in each client is randomly chosen from 10 to 60.
+        New scenario: the number of cells and number of UEs in each cell is fixed from the initial stage.
+            10 clients, the number of UEs in each clients is [10,20,30,40,50,60,70,80,90,100] respectively.
+            Each client create its own training dataset (include #num_train samples, 1 graph in each sample has corresponding #num_ue nodes)
+            --> After training stage, each client has own train_loss value respectively.
+                - train_loss_client0                - train_loss_client 5
+                - train_loss_client1                - train_loss_client 6
+                - train_loss_client2                - train_loss_client 7
+                - train_loss_client3                - train_loss_client 8
+                - train_loss_client4                - train_loss_client 9
+            --> These loss values will be back-propagated to update local model parameter, we have
+                - omega_0                           - omega_5
+                - omega_1                           - omega_6
+                - omega_2                           - omega_7
+                - omega_3                           - omega_8
+                - omega_4                           - omega_9  
+            10 omega_sets will be sent to the server and then being avg process, new global omega: omega_avg
+            this omega_avg will test with 3 different testing dataset: testdata_10, testdata_50, testdata_100.
+            --> We will have 3 testing loss value respectively: (and on the right column is the bench mark to compare)
+                - test_loss_10                      - centralized_train10_test10 / centralized_train50_test10 / centralized_train100_test10 
+                - test_loss_50                      - centralized_train50_test_10 / centralized_train50_test_50 / centralized_train50_test_100
+                - test_loss_100                     - centralized_train100_test_10 / centralized_train100_test_50 / centralized_train100_test_100
+            We hope that with the same number of epochs (in FL case, local iteration =1), FL_GNN has approximate performance with centralized GNN case
         '''
         data_client = self.proc_data(num_sample, num_ue)
         return data_client
