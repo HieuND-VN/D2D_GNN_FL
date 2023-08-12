@@ -47,6 +47,20 @@ class Env():
         print(f"Frequency of the channel: {self.freq}")
         print("=============================================================================")
 
+
+    def create_graph_data_bm(self, num_user, is_train = False):
+        num_ue = num_user
+        if is_train:
+            num_sample = self.num_train
+            data_list = self.proc_data(num_sample, num_ue)
+            data_loader = DataLoader(data_list, batch_size=self.batch_size, shuffle=True, num_workers=1)
+            return data_loader
+        else:
+            num_sample = self.num_test
+            data_list = self.proc_data(num_sample, num_ue)
+            data_loader = DataLoader(data_list, batch_size=self.batch_size, shuffle=True, num_workers=1)
+            return data_loader
+
     def create_graph_data_train(self, id):
         num_sample = self.num_train
         num_ue = self.num_ue_array[id]

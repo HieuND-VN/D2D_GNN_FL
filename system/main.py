@@ -7,6 +7,7 @@ import numpy as np
 import logging
 
 from flcore.servers.serveravg import FedAvg
+from flcore.benchmark.benchmark import *
 
 from flcore.trainmodel.models import *
 
@@ -19,10 +20,15 @@ logger.setLevel(logging.ERROR)
 
 warnings.simplefilter("ignore")
 torch.manual_seed(0)
-def run(args, env):
+def run(args, env, benchmark_10, benchmark_50, benchmark_100):
     time_list = []
     reporter = MemReporter()
     env.show_result_graph()
+    #Calculate to compare with 1 cell train and test with same number of UE
+    loss_tr10, loss_tr10_te10, loss_tr10_te50, loss_tr10_te100 = benchmark_10.calculate()
+    loss_tr50, loss_tr50_te10, loss_tr50_te50, loss_tr50_te100 = benchmark_10.calculate()
+    loss_tr100, loss_tr100_te10, loss_tr100_te50, loss_tr100_te100 = benchmark_10.calculate()
+
     for i in range(args.prev, args.times):
         print(f"\n============= Running time: {i}th =============")
         print("Creating server and clients ...")
@@ -32,6 +38,7 @@ def run(args, env):
         server = FedAvg(args, i, env)
         server.train(env)
         time_list.append(time.time() - start)
+        server.illustrate(env)
 
     print(f"\n>>>>>>>>>>>>Average time cost: {round(np.average(time_list), 2)}s.")
     # env.show_result_graph()
@@ -159,7 +166,17 @@ if __name__ == "__main__":
     print("=" * 50)
     env = Env(args)
     env.env_print()
-    run(args, env)
+    trainloader_bm10 = env.create_graph_data_bm(num_user=10, is_train=True)
+    trainloader_bm50 = env.create_graph_data_bm(num_user=50, is_train=True)
+    trainloader_bm100 = env.create_graph_data_bm(num_user=100, is_train=True)
+    testloader_bm10 = env.create_graph_data_bm(num_user=10, is_train=False)
+    testloader_bm50 = env.create_graph_data_bm(num_user=50, is_train=False)
+    testloader_bm100 = env.create_graph_data_bm(num_user=100, is_train=False)
+    benchmark_10 = Benchmark10(args, trainloader_bm10, testloader_bm10, testloader_bm50, testloader_bm100)
+    benchmark_50 = Benchmark50(args, trainloader_bm50, testloader_bm10, testloader_bm50, testloader_bm100)
+    benchmark_100 = Benchmark100(args, trainloader_bm100, testloader_bm10, testloader_bm50, testloader_bm100)
+    run(args, env, benchmark_10, benchmark_50, benchmark_100)
+
 
 
 

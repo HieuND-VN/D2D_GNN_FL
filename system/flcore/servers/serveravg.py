@@ -52,7 +52,8 @@ class FedAvg(Server):
             3.2. FL test_50 vs. train_10_test_50, train_50_test_50, train_100_test_50
             3.3. FL test_100 vs train_10_test_100, train_50_test_100, train_100_test_100
         '''
-        self.illustrate(env)
+        # self.illustrate(env)
+
 
 
         print("\nAverage time cost per round.", sum(self.Budget[1:])/len(self.Budget[1:]))
