@@ -52,7 +52,8 @@ class Client(object):
         self.learning_rate_decay = args.learning_rate_decay
 
         self.num_ue = env.num_ue_array[self.id]
-        self.train_data_loader_client = env.create_graph_data_train(self.id)
+        self.train_data_loader_client = env.create_graph_data_train(id = self.id)
+        self.test_data_loader_client = env.create_graph_data_test(num_user = self.num_ue)
         self.test_data_loader_10 = env.create_graph_data_test(num_user = 10)
         self.test_data_loader_50 = env.create_graph_data_test(num_user=50)
         self.test_data_loader_100 = env.create_graph_data_test(num_user=100)
@@ -66,23 +67,19 @@ class Client(object):
     def clone_model(self, model, target):
         for param, target_param in zip(model.parameters(), target.parameters()):
             target_param.data = param.data.clone()
-            # target_param.grad = param.grad.clone()
 
     def update_parameters(self, model, new_params):
         for param, new_param in zip(model.parameters(), new_params):
             param.data = new_param.data.clone()
 
     def test_metrics(self):
-        # testloaderfull = self.load_test_data()
         self.model.eval()
         total_loss_10 = 0
-        test_loss_10 = 0
         total_loss_50 = 0
-        test_loss_50 = 0
         total_loss_100 = 0
-        test_loss_100 = 0
         total_loss = 0
-        test_loss = 0
+
+        # self_test
         for data in self.test_data_loader_client:
             data = data.to(self.device)
             with torch.no_grad():
@@ -90,6 +87,8 @@ class Client(object):
                 loss = self.sr_loss(data, out, self.num_ue)
                 total_loss += loss.item() * data.num_graphs
         test_loss = total_loss / self.num_test
+
+        #test_10 user
         for data_10 in self.test_data_loader_10:
             data_10 = data_10.to(self.device)
             with torch.no_grad():
@@ -98,6 +97,7 @@ class Client(object):
                 total_loss_10 += loss_10.item() * data_10.num_graphs
         test_loss_10 = total_loss_10 / self.num_test
 
+        #test_50 user
         for data_50 in self.test_data_loader_50:
             data_50 = data_50.to(self.device)
             with torch.no_grad():
@@ -106,6 +106,7 @@ class Client(object):
                 total_loss_50 += loss_50.item() * data_50.num_graphs
         test_loss_50 = total_loss_50 / self.num_test
 
+        #test_100 user
         for data_100 in self.test_data_loader_100:
             data_100 = data_100.to(self.device)
             with torch.no_grad():

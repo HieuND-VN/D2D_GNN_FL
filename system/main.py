@@ -104,7 +104,7 @@ if __name__ == "__main__":
     parser.add_argument('-ntr', "--num_train", type = int, default = 300)
     parser.add_argument('-nte', "--num_test", type = int, default = 50)
     parser.add_argument('-uemin', "--num_ue_min", type = int, default = 10)
-    parser.add_argument('-uemax', "--num_ue_max", type = int, default = 60)
+    parser.add_argument('-uemax', "--num_ue_max", type = int, default = 100)
     parser.add_argument('-var', "--var_db", type = int, default = 1)
     parser.add_argument('-itf', "--interference", type = float, default = 0.5,
                         help="Normalize Interference in Case2")

@@ -55,9 +55,9 @@ class Server(object):
 
         self.train_loss_save = []
         self.test_loss_client_save = []
-        self.test_loss_client_10 = []
-        self.test_loss_client_50 = []
-        self.test_loss_client_100 = []
+        self.test_loss_10_save = []
+        self.test_loss_50_save = []
+        self.test_loss_100_save = []
 
 
     def set_clients(self, args, clientObj, env):
@@ -214,18 +214,23 @@ class Server(object):
     def evaluate(self, acc=None, loss=None):
         stats_test = self.test_metrics()
         stats_train = self.train_metrics()
-        test_loss_client = sum(stats_test[1]) / int(self.num_clients)
-        test_loss_10 = sum(stats_test[2]) / int(self.num_clients)
-        test_loss_50 = sum(stats_test[3]) / int(self.num_clients)
-        test_loss_100 = sum(stats_test[4]) / int(self.num_clients)
-        train_loss = sum(stats_train[1]) / int(self.num_clients)
+        # test_loss_client = sum(stats_test[1]) / int(self.num_clients)
+        # test_loss_10 = sum(stats_test[2]) / int(self.num_clients)
+        # test_loss_50 = sum(stats_test[3]) / int(self.num_clients)
+        # test_loss_100 = sum(stats_test[4]) / int(self.num_clients)
+        # train_loss = sum(stats_train[1]) / int(self.num_clients)
+        test_loss_client = sum(stats_test[1])
+        test_loss_10 = sum(stats_test[2])
+        test_loss_50 = sum(stats_test[3])
+        test_loss_100 = sum(stats_test[4])
+        train_loss = sum(stats_train[1])
         if acc == None:
             self.rs_test_loss_client.append(test_loss_client)
             self.rs_test_loss_10.append(test_loss_10)
             self.rs_test_loss_50.append(test_loss_50)
             self.rs_test_loss_100.append(test_loss_100)
         else:
-            acc.append(test_loss)
+            acc.append(test_loss_client)
 
         if loss == None:
             self.rs_train_loss.append(train_loss)

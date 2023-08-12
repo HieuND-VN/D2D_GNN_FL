@@ -223,16 +223,16 @@ class Env():
     def show_result_graph(self):
         seed = 2017
         for i in range(self.num_clients):
-            num_users = self.num_ue_case1[i]
+            num_users = self.num_ue_array[i]
             num_tests = self.num_test
             Xtest, Ytest, Atest, Ytest2 = self.generate_wGaussian(num_users, num_tests)
             baseline_Y = self.simple_greedy(Xtest, Atest, Ytest, num_users)
             self.greedy.append(self.np_sum_rate(Xtest, baseline_Y, Atest))
             self.weighted_case.append(self.np_sum_rate(Xtest.transpose(0, 2, 1), Ytest, Atest))
             self.unweighted_case.append(self.np_sum_rate(Xtest.transpose(0, 2, 1), Ytest2, Atest))
-        print(f'Greedy - Baseline Methods:  {sum(self.greedy)}')
-        print(f'WMMSE - Weighted Case:      {sum(self.weighted_case)}')
-        print(f'WMMSE - Unweighted Case:    {sum(self.unweighted_case)}')
+        print(f'Greedy - Baseline Methods:  {sum(self.greedy)/self.num_clients}')
+        print(f'WMMSE - Weighted Case:      {sum(self.weighted_case)/self.num_clients}')
+        print(f'WMMSE - Unweighted Case:    {sum(self.unweighted_case)/self.num_clients}')
 
 
 

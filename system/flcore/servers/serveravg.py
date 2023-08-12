@@ -10,8 +10,6 @@ class FedAvg(Server):
         # select slow clients
         self.set_slow_clients()
         self.set_clients(args, clientAVG, env)
-        for client in self.clients:
-            print(f'Number of mobile user in client[{client.id}]: [{client.num_ue_case1}]')
 
 
         print(f"\nJoin ratio / total clients: {self.join_ratio} / {self.num_clients}")
