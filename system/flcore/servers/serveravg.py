@@ -19,7 +19,7 @@ class FedAvg(Server):
         self.Budget = []
 
 
-    def train(self):
+    def train(self,env):
         for i in range(self.global_rounds+1):
             s_t = time.time()
             self.selected_clients = self.select_clients()
@@ -38,7 +38,7 @@ class FedAvg(Server):
             self.Budget.append(time.time() - s_t)
             print('>'*10, 'time cost: ', self.Budget[-1])
 
-        print(f'Best result: -Train: {min(self.train_loss_save)} -Test: {min(self.test_loss_save)}')
+        # print(f'Best result: -Train: {min(self.train_loss_save)} -Test: {min(self.test_loss_save)}')
         '''
         Compare scenarios
         1. FL train_loss and test loss (test_loss_10, test_loss_50, test_loss_100)
@@ -52,7 +52,7 @@ class FedAvg(Server):
             3.2. FL test_50 vs. train_10_test_50, train_50_test_50, train_100_test_50
             3.3. FL test_100 vs train_10_test_100, train_50_test_100, train_100_test_100
         '''
-        self.illustrate()
+        self.illustrate(env)
 
 
         print("\nAverage time cost per round.", sum(self.Budget[1:])/len(self.Budget[1:]))

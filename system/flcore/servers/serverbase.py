@@ -214,16 +214,16 @@ class Server(object):
     def evaluate(self, acc=None, loss=None):
         stats_test = self.test_metrics()
         stats_train = self.train_metrics()
-        # test_loss_client = sum(stats_test[1]) / int(self.num_clients)
-        # test_loss_10 = sum(stats_test[2]) / int(self.num_clients)
-        # test_loss_50 = sum(stats_test[3]) / int(self.num_clients)
-        # test_loss_100 = sum(stats_test[4]) / int(self.num_clients)
-        # train_loss = sum(stats_train[1]) / int(self.num_clients)
-        test_loss_client = sum(stats_test[1])
-        test_loss_10 = sum(stats_test[2])
-        test_loss_50 = sum(stats_test[3])
-        test_loss_100 = sum(stats_test[4])
-        train_loss = sum(stats_train[1])
+        test_loss_client = sum(stats_test[1]) / int(self.num_clients)
+        test_loss_10 = sum(stats_test[2]) / int(self.num_clients)
+        test_loss_50 = sum(stats_test[3]) / int(self.num_clients)
+        test_loss_100 = sum(stats_test[4]) / int(self.num_clients)
+        train_loss = sum(stats_train[1]) / int(self.num_clients)
+        # test_loss_client = sum(stats_test[1])
+        # test_loss_10 = sum(stats_test[2])
+        # test_loss_50 = sum(stats_test[3])
+        # test_loss_100 = sum(stats_test[4])
+        # train_loss = sum(stats_train[1])
         if acc == None:
             self.rs_test_loss_client.append(test_loss_client)
             self.rs_test_loss_10.append(test_loss_10)
@@ -284,14 +284,15 @@ class Server(object):
         return True
 
 
-    def illustrate(self):
+    def illustrate(self, env):
         x = np.arange(1, self.global_rounds+1)
+        optimization = np.full_like(x,1)*(sum(env.weighted_case)/self.num_clients)
         # SumRateMMSEplot = np.full_like(x,1)*7.5
         plt.plot(self.train_loss_save, label = 'Training')
         plt.plot(self.test_loss_client_save, label='Testing N = local number')
         plt.plot(self.test_loss_10_save, label='Testing N = 10')
         plt.plot(self.test_loss_50_save, label='Testing N = 50')
         plt.plot(self.test_loss_100_save, label='Testing N = 100')
-        # plt.plot(x,SumRateMMSEplot, label = 'Optimization')
+        plt.plot(x,optimization, label = 'Optimization')
         plt.legend()
         plt.show()

@@ -30,7 +30,7 @@ def run(args, env):
         args.model = IGCNet().to(args.device)
         print(args.model)
         server = FedAvg(args, i, env)
-        server.train()
+        server.train(env)
         time_list.append(time.time() - start)
 
     print(f"\n>>>>>>>>>>>>Average time cost: {round(np.average(time_list), 2)}s.")
