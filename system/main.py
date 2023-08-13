@@ -14,39 +14,66 @@ from flcore.trainmodel.models import *
 from utils.mem_utils import MemReporter
 
 from utils.environment import Env
+import matplotlib.pyplot as plt
 
 logger = logging.getLogger()
 logger.setLevel(logging.ERROR)
 
 warnings.simplefilter("ignore")
 torch.manual_seed(0)
+
+def illustrate_bm(args, loss_tr, loss_te10, loss_te50, loss_te100, case = 1):
+    x = np.arange(0, args.global_rounds + 1)
+    plt.plot(loss_tr, label='Training')
+    plt.plot(loss_te10, label='Testing N = 10')
+    plt.plot(loss_te50, label='Testing N = 50')
+    plt.plot(loss_te100, label='Testing N = 100')
+    plt.xlabel('Number of epoch')
+    if case == 1:
+        plt.ylabel('Reward N = 10')
+        plt.legend()
+        plt.show()
+        plt.savefig('Reward10.png', bbox_inches='tight')
+    elif case == 2:
+        plt.ylabel('Reward N = 50')
+        plt.legend()
+        plt.show()
+        plt.savefig('Reward50.png', bbox_inches='tight')
+    else:
+        plt.ylabel('Reward N = 100')
+        plt.legend()
+        plt.show()
+        plt.savefig('Reward100.png', bbox_inches='tight')
 def run(args, env, benchmark_10, benchmark_50, benchmark_100):
     time_list = []
     reporter = MemReporter()
     env.show_result_graph()
     #Calculate to compare with 1 cell train and test with same number of UE
     loss_tr10, loss_tr10_te10, loss_tr10_te50, loss_tr10_te100 = benchmark_10.calculate()
-    loss_tr50, loss_tr50_te10, loss_tr50_te50, loss_tr50_te100 = benchmark_10.calculate()
-    loss_tr100, loss_tr100_te10, loss_tr100_te50, loss_tr100_te100 = benchmark_10.calculate()
+    loss_tr50, loss_tr50_te10, loss_tr50_te50, loss_tr50_te100 = benchmark_50.calculate()
+    loss_tr100, loss_tr100_te10, loss_tr100_te50, loss_tr100_te100 = benchmark_100.calculate()
+    illustrate_bm(args, loss_tr10, loss_tr10_te10, loss_tr50_te10, loss_tr100_te10, case = 1)
+    illustrate_bm(args, loss_tr50, loss_tr10_te50, loss_tr50_te50, loss_tr100_te50, case = 2)
+    illustrate_bm(args, loss_tr100, loss_tr10_te100, loss_tr50_te100, loss_tr100_te100, case = 3)
 
 
-    for i in range(args.prev, args.times):
-        print(f"\n============= Running time: {i}th =============")
-        print("Creating server and clients ...")
-        start = time.time()
-        args.model = IGCNet().to(args.device)
-        print(args.model)
-        server = FedAvg(args, i, env)
-        server.train(env)
-        time_list.append(time.time() - start)
-        server.illustrate(env)
+    # for i in range(args.prev, args.times):
+    #     print(f"\n============= Running time: {i}th =============")
+    #     print("Creating server and clients ...")
+    #     start = time.time()
+    #     args.model = IGCNet().to(args.device)
+    #     print(args.model)
+    #     server = FedAvg(args, i, env)
+    #     server.train(env)
+    #     time_list.append(time.time() - start)
+    #     server.illustrate(env)
 
-    print(f"\n>>>>>>>>>>>>Average time cost: {round(np.average(time_list), 2)}s.")
+    # print(f"\n>>>>>>>>>>>>Average time cost: {round(np.average(time_list), 2)}s.")
     # env.show_result_graph()
     # Global average
     # show_result_graph(args.num_user, args.test_samples, args.var_db, args.num_clients)
 
-    reporter.report()
+    # reporter.report()
     '''
     Compare scenarios
     1. FL train_loss and test loss (test_loss_10, test_loss_50, test_loss_100)
@@ -109,8 +136,8 @@ if __name__ == "__main__":
     parser.add_argument('-tth', "--time_threthold", type=float, default=10000,
                         help="The threthold for droping slow clients")
     # GraphNN
-    parser.add_argument('-ntr', "--num_train", type = int, default = 3000)
-    parser.add_argument('-nte', "--num_test", type = int, default = 500)
+    parser.add_argument('-ntr', "--num_train", type = int, default = 100)
+    parser.add_argument('-nte', "--num_test", type = int, default = 50)
     parser.add_argument('-uemin', "--num_ue_min", type = int, default = 10)
     parser.add_argument('-uemax', "--num_ue_max", type = int, default = 100)
     parser.add_argument('-var', "--var_db", type = int, default = 1)
@@ -168,11 +195,17 @@ if __name__ == "__main__":
     env = Env(args)
     env.env_print()
     trainloader_bm10 = env.create_graph_data_bm(num_user=10, is_train=True)
+    print(f'Trainloader_bm10')
     trainloader_bm50 = env.create_graph_data_bm(num_user=50, is_train=True)
+    print(f'Trainloader_bm50')
     trainloader_bm100 = env.create_graph_data_bm(num_user=100, is_train=True)
+    print(f'Trainloader_bm100')
     testloader_bm10 = env.create_graph_data_bm(num_user=10, is_train=False)
+    print(f'Testloader_bm10')
     testloader_bm50 = env.create_graph_data_bm(num_user=50, is_train=False)
+    print(f'Testloader_bm50')
     testloader_bm100 = env.create_graph_data_bm(num_user=100, is_train=False)
+    print(f'Testloader_bm100')
     benchmark_10 = Benchmark10(args, trainloader_bm10, testloader_bm10, testloader_bm50, testloader_bm100)
     benchmark_50 = Benchmark50(args, trainloader_bm50, testloader_bm10, testloader_bm50, testloader_bm100)
     benchmark_100 = Benchmark100(args, trainloader_bm100, testloader_bm10, testloader_bm50, testloader_bm100)
