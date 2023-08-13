@@ -14,7 +14,7 @@ class Env():
 
         # Device information
         self.num_clients = args.num_clients
-        self.num_ue_array = np.arange(args.num_ue_min, args.num_ue_max+1, 10)
+        self.num_ue_array = np.arange(args.num_ue_min, args.num_ue_max+1, 2)
         self.diameter = args.diameter
 
 
