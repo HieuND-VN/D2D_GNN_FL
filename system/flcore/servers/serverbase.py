@@ -294,7 +294,10 @@ class Server(object):
         plt.plot(self.test_loss_50_save, label='Testing N = 50')
         plt.plot(self.test_loss_100_save, label='Testing N = 100')
         plt.plot(x,optimization, label = 'Optimization')
+        plt.xlabel('Number of epoch')
+        plt.ylabel('Reward')
         plt.legend()
         plt.show()
+        plt.savefig('Reward1.png', bbox_inches='tight')
 
 

@@ -29,6 +29,7 @@ def run(args, env, benchmark_10, benchmark_50, benchmark_100):
     loss_tr50, loss_tr50_te10, loss_tr50_te50, loss_tr50_te100 = benchmark_10.calculate()
     loss_tr100, loss_tr100_te10, loss_tr100_te50, loss_tr100_te100 = benchmark_10.calculate()
 
+
     for i in range(args.prev, args.times):
         print(f"\n============= Running time: {i}th =============")
         print("Creating server and clients ...")
@@ -77,7 +78,7 @@ if __name__ == "__main__":
     parser.add_argument('-lr', "--local_learning_rate", type=float, default=0.005, help="Local learning rate")
     parser.add_argument('-ld', "--learning_rate_decay", type=bool, default=False)
     parser.add_argument('-ldg', "--learning_rate_decay_gamma", type=float, default=0.99)
-    parser.add_argument('-gr', "--global_rounds", type=int, default=500)
+    parser.add_argument('-gr', "--global_rounds", type=int, default=50)
     parser.add_argument('-ls', "--local_steps", type=int, default=1)
     parser.add_argument('-algo', "--algorithm", type=str, default="FedAvg")
     parser.add_argument('-jr', "--join_ratio", type=float, default=1.0,
