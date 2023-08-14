@@ -50,8 +50,11 @@ def run(args, env, benchmark_10, benchmark_50, benchmark_100):
     reporter = MemReporter()
     env.show_result_graph()
     #Calculate to compare with 1 cell train and test with same number of UE
+    print('============================ Benchmark 10 ============================')
     loss_tr10, loss_tr10_te10, loss_tr10_te50, loss_tr10_te100 = benchmark_10.calculate(is_print = True)
+    print('============================ Benchmark 50 ============================')
     loss_tr50, loss_tr50_te10, loss_tr50_te50, loss_tr50_te100 = benchmark_50.calculate(is_print = True)
+    print('============================ Benchmark 100 ============================')
     loss_tr100, loss_tr100_te10, loss_tr100_te50, loss_tr100_te100 = benchmark_100.calculate(is_print = True)
     print('='*50)
     # illustrate_bm(args, loss_tr10, loss_tr10_te10, loss_tr10_te50, loss_tr10_te100, case=1)

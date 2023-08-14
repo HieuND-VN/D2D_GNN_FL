@@ -91,8 +91,8 @@ class Benchmark10():
                     total_loss_te100 += loss_100.item()*data_100.num_graphs
             loss_te100 = (total_loss_te100/self.num_test)*-1
 
-            if (step%25 == 0) and (is_print):
-                print('Epoch: {:03d}: [Train_10: {:.4f}] --- [Test_10: {:.4f}]  --- [Test_50: {:.4f}] --- [Test_100: {:.4f}]'.format(step, loss_tr, loss_te10, loss_te50, loss_te100))
+            if is_print:
+                print('[BASE 10] Epoch: {:03d}: [Train_10: {:.4f}] --- [Test_10: {:.4f}]  --- [Test_50: {:.4f}] --- [Test_100: {:.4f}]'.format(step, loss_tr, loss_te10, loss_te50, loss_te100))
 
             self.loss_train.append(loss_tr)
             self.loss_test_10.append(loss_te10)
@@ -189,7 +189,7 @@ class Benchmark50():
                     total_loss_te100 += loss_100.item() * data_100.num_graphs
             loss_te100 = (total_loss_te100 / self.num_test) * -1
 
-            if (step%25 == 0) and (is_print):
+            if is_print:
                 print('[BASE_50] Epoch: {:03d}: [Train: {:.4f}] --- [Test_10: {:.4f}]  --- [Test_50: {:.4f}] --- [Test_100: {:.4f}]'.format(step, loss_tr, loss_te10, loss_te50, loss_te100))
 
             self.loss_train.append(loss_tr)
@@ -286,7 +286,7 @@ class Benchmark100():
             loss_te100 = (total_loss_te100 / self.num_test) * -1
 
             if is_print:
-                print('Epoch: {:03d}: [Train_10: {:.4f}] --- [Test_10: {:.4f}]  --- [Test_50: {:.4f}] --- [Test_100: {:.4f}]'.format(step, loss_tr, loss_te10, loss_te50, loss_te100))
+                print('[BASE 100 ]Epoch: {:03d}: [Train_10: {:.4f}] --- [Test_10: {:.4f}]  --- [Test_50: {:.4f}] --- [Test_100: {:.4f}]'.format(step, loss_tr, loss_te10, loss_te50, loss_te100))
 
             self.loss_train.append(loss_tr)
             self.loss_test_10.append(loss_te10)
