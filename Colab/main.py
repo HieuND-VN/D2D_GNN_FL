@@ -18,5 +18,5 @@ plt.plot(x, optimization, label = "optimization")
 plt.xlabel("number of epoch")
 plt.ylabel('Reward')
 plt.legend()
-# %matplotlib inline
+%matplotlib inline
 plt.show()
