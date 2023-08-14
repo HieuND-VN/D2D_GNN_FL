@@ -32,30 +32,34 @@ def illustrate_bm(args, loss_tr, loss_te10, loss_te50, loss_te100, case = 1):
     if case == 1:
         plt.ylabel('Reward N = 10')
         plt.legend()
-        plt.show()
         plt.savefig('Reward10.png', bbox_inches='tight')
+        plt.show()
     elif case == 2:
         plt.ylabel('Reward N = 50')
         plt.legend()
-        plt.show()
         plt.savefig('Reward50.png', bbox_inches='tight')
+        plt.show()
     else:
         plt.ylabel('Reward N = 100')
         plt.legend()
-        plt.show()
         plt.savefig('Reward100.png', bbox_inches='tight')
+        plt.show()
 def run(args, env, benchmark_10, benchmark_50, benchmark_100):
 # def run(args, env, benchmark_10):
     time_list = []
     reporter = MemReporter()
     env.show_result_graph()
     #Calculate to compare with 1 cell train and test with same number of UE
-    loss_tr10, loss_tr10_te10, loss_tr10_te50, loss_tr10_te100 = benchmark_10.calculate()
-    loss_tr50, loss_tr50_te10, loss_tr50_te50, loss_tr50_te100 = benchmark_50.calculate()
-    loss_tr100, loss_tr100_te10, loss_tr100_te50, loss_tr100_te100 = benchmark_100.calculate()
-# illustrate_bm(args, loss_tr10, loss_tr10_te10, loss_tr10_te50, loss_tr10_te100, case=1)
+    loss_tr10, loss_tr10_te10, loss_tr10_te50, loss_tr10_te100 = benchmark_10.calculate(is_print = True)
+    loss_tr50, loss_tr50_te10, loss_tr50_te50, loss_tr50_te100 = benchmark_50.calculate(is_print = True)
+    loss_tr100, loss_tr100_te10, loss_tr100_te50, loss_tr100_te100 = benchmark_100.calculate(is_print = True)
+    print('='*50)
+    # illustrate_bm(args, loss_tr10, loss_tr10_te10, loss_tr10_te50, loss_tr10_te100, case=1)
+    print('Illustrate_1')
     illustrate_bm(args, loss_tr10, loss_tr10_te10, loss_tr50_te10, loss_tr100_te10, case = 1)
+    print('Illustrate_2')
     illustrate_bm(args, loss_tr50, loss_tr10_te50, loss_tr50_te50, loss_tr100_te50, case = 2)
+    print('Illustrate_3')
     illustrate_bm(args, loss_tr100, loss_tr10_te100, loss_tr50_te100, loss_tr100_te100, case = 3)
 
 
@@ -71,7 +75,7 @@ def run(args, env, benchmark_10, benchmark_50, benchmark_100):
         server.illustrate(env)
 
     print(f"\n>>>>>>>>>>>>Average time cost: {round(np.average(time_list), 2)}s.")
-    env.show_result_graph()
+    # env.show_result_graph()
     # Global average
     # show_result_graph(args.num_user, args.test_samples, args.var_db, args.num_clients)
 
@@ -103,7 +107,7 @@ if __name__ == "__main__":
     parser.add_argument('-did', "--device_id", type=str, default="0")
     parser.add_argument('-data', "--dataset", type=str, default="CFMIMO")
     parser.add_argument('-nb', "--num_classes", type=int, default=10)
-    parser.add_argument('-lbs', "--batch_size", type=int, default=10)
+    parser.add_argument('-lbs', "--batch_size", type=int, default=100)
     parser.add_argument('-lr', "--local_learning_rate", type=float, default=0.005, help="Local learning rate")
     parser.add_argument('-ld', "--learning_rate_decay", type=bool, default=False)
     parser.add_argument('-ldg', "--learning_rate_decay_gamma", type=float, default=0.99)
@@ -114,7 +118,7 @@ if __name__ == "__main__":
                         help="Ratio of clients per round")
     parser.add_argument('-rjr', "--random_join_ratio", type=bool, default=False,
                         help="Random ratio of clients per round")
-    parser.add_argument('-nc', "--num_clients", type=int, default=5,
+    parser.add_argument('-nc', "--num_clients", type=int, default=10,
                         help="Total number of clients")
     parser.add_argument('-pv', "--prev", type=int, default=0,
                         help="Previous Running times")
@@ -138,10 +142,10 @@ if __name__ == "__main__":
     parser.add_argument('-tth', "--time_threthold", type=float, default=10000,
                         help="The threthold for droping slow clients")
     # GraphNN
-    parser.add_argument('-ntr', "--num_train", type = int, default = 100)
-    parser.add_argument('-nte', "--num_test", type = int, default = 50)
-    parser.add_argument('-uemin', "--num_ue_min", type = int, default = 2)
-    parser.add_argument('-uemax', "--num_ue_max", type = int, default = 10)
+    parser.add_argument('-ntr', "--num_train", type = int, default = 3000)
+    parser.add_argument('-nte', "--num_test", type = int, default = 500)
+    parser.add_argument('-uemin', "--num_ue_min", type = int, default = 10)
+    parser.add_argument('-uemax', "--num_ue_max", type = int, default = 100)
     parser.add_argument('-var', "--var_db", type = int, default = 1)
     parser.add_argument('-itf', "--interference", type = float, default = 0.5,
                         help="Normalize Interference in Case2")
@@ -196,17 +200,17 @@ if __name__ == "__main__":
     print("=" * 50)
     env = Env(args)
     env.env_print()
-    trainloader_bm10 = env.create_graph_data_bm(num_user=2, is_train=True)
+    trainloader_bm10 = env.create_graph_data_bm(num_user=10, is_train=True)
     print(f'Trainloader_bm10')
-    trainloader_bm50 = env.create_graph_data_bm(num_user=6, is_train=True)
+    trainloader_bm50 = env.create_graph_data_bm(num_user=50, is_train=True)
     print(f'Trainloader_bm50')
-    trainloader_bm100 = env.create_graph_data_bm(num_user=10, is_train=True)
+    trainloader_bm100 = env.create_graph_data_bm(num_user=100, is_train=True)
     print(f'Trainloader_bm100')
-    testloader_bm10 = env.create_graph_data_bm(num_user=2, is_train=False)
+    testloader_bm10 = env.create_graph_data_bm(num_user=10, is_train=False)
     print(f'Testloader_bm10')
-    testloader_bm50 = env.create_graph_data_bm(num_user=6, is_train=False)
+    testloader_bm50 = env.create_graph_data_bm(num_user=50, is_train=False)
     print(f'Testloader_bm50')
-    testloader_bm100 = env.create_graph_data_bm(num_user=10, is_train=False)
+    testloader_bm100 = env.create_graph_data_bm(num_user=100, is_train=False)
     print(f'Testloader_bm100')
     benchmark_10 = Benchmark10(args, trainloader_bm10, testloader_bm10, testloader_bm50, testloader_bm100)
     benchmark_50 = Benchmark50(args, trainloader_bm50, testloader_bm10, testloader_bm50, testloader_bm100)

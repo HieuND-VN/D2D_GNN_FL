@@ -53,8 +53,8 @@ class Benchmark10():
                 data = data.to(self.device)
                 self.optimizer.zero_grad()
                 out = self.model(data)
-                # loss = self.sr_loss(data, out, K = 10)
-                loss = self.sr_loss(data, out, K=2)
+                loss = self.sr_loss(data, out, K = 10)
+                # loss = self.sr_loss(data, out, K=2)
                 loss.backward()
                 total_loss_train += loss.item()*data.num_graphs
                 self.optimizer.step()
@@ -68,8 +68,8 @@ class Benchmark10():
                 data_10 = data_10.to(self.device)
                 with torch.no_grad():
                     out_10 = self.model(data_10)
-                    # loss_10 = self.sr_loss(data_10, out_10, K = 10)
-                    loss_10 = self.sr_loss(data_10, out_10, K=2)
+                    loss_10 = self.sr_loss(data_10, out_10, K = 10)
+                    # loss_10 = self.sr_loss(data_10, out_10, K=2)
                     total_loss_te10 += loss_10.item()*data_10.num_graphs
             loss_te10 = (total_loss_te10/self.num_test)*-1
 
@@ -77,8 +77,8 @@ class Benchmark10():
                 data_50 = data_50.to(self.device)
                 with torch.no_grad():
                     out_50 = self.model(data_50)
-                    # loss_50 = self.sr_loss(data_50, out_50, K = 50)
-                    loss_50 = self.sr_loss(data_50, out_50, K=6)
+                    loss_50 = self.sr_loss(data_50, out_50, K = 50)
+                    # loss_50 = self.sr_loss(data_50, out_50, K=6)
                     total_loss_te50 += loss_50.item()*data_50.num_graphs
             loss_te50 = (total_loss_te50/self.num_test)*-1
 
@@ -86,8 +86,8 @@ class Benchmark10():
                 data_100 = data_100.to(self.device)
                 with torch.no_grad():
                     out_100 = self.model(data_100)
-                    # loss_100 = self.sr_loss(data_100, out_100, K = 100)
-                    loss_100 = self.sr_loss(data_100, out_100, K=10)
+                    loss_100 = self.sr_loss(data_100, out_100, K = 100)
+                    # loss_100 = self.sr_loss(data_100, out_100, K=10)
                     total_loss_te100 += loss_100.item()*data_100.num_graphs
             loss_te100 = (total_loss_te100/self.num_test)*-1
 
@@ -151,8 +151,8 @@ class Benchmark50():
                 data = data.to(self.device)
                 self.optimizer.zero_grad()
                 out = self.model(data)
-                # loss = self.sr_loss(data, out, K=50)
-                loss = self.sr_loss(data, out, K=6)
+                loss = self.sr_loss(data, out, K=50)
+                # loss = self.sr_loss(data, out, K=6)
                 loss.backward()
                 total_loss_train += loss.item() * data.num_graphs
                 self.optimizer.step()
@@ -166,8 +166,8 @@ class Benchmark50():
                 data_10 = data_10.to(self.device)
                 with torch.no_grad():
                     out_10 = self.model(data_10)
-                    # loss_10 = self.sr_loss(data_10, out_10, K=10)
-                    loss_10 = self.sr_loss(data_10, out_10, K=2)
+                    loss_10 = self.sr_loss(data_10, out_10, K=10)
+                    # loss_10 = self.sr_loss(data_10, out_10, K=2)
                     total_loss_te10 += loss_10.item() * data_10.num_graphs
             loss_te10 = (total_loss_te10 / self.num_test) * -1
 
@@ -175,8 +175,8 @@ class Benchmark50():
                 data_50 = data_50.to(self.device)
                 with torch.no_grad():
                     out_50 = self.model(data_50)
-                    # loss_50 = self.sr_loss(data_50, out_50, K=50)
-                    loss_50 = self.sr_loss(data_50, out_50, K=6)
+                    loss_50 = self.sr_loss(data_50, out_50, K=50)
+                    # loss_50 = self.sr_loss(data_50, out_50, K=6)
                     total_loss_te50 += loss_50.item() * data_50.num_graphs
             loss_te50 = (total_loss_te50 / self.num_test) * -1
 
@@ -184,8 +184,8 @@ class Benchmark50():
                 data_100 = data_100.to(self.device)
                 with torch.no_grad():
                     out_100 = self.model(data_100)
-                    # loss_100 = self.sr_loss(data_100, out_100, K=100)
-                    loss_100 = self.sr_loss(data_100, out_100, K=10)
+                    loss_100 = self.sr_loss(data_100, out_100, K=100)
+                    # loss_100 = self.sr_loss(data_100, out_100, K=10)
                     total_loss_te100 += loss_100.item() * data_100.num_graphs
             loss_te100 = (total_loss_te100 / self.num_test) * -1
 
@@ -247,8 +247,8 @@ class Benchmark100():
                 data = data.to(self.device)
                 self.optimizer.zero_grad()
                 out = self.model(data)
-                # loss = self.sr_loss(data, out, K=100)
-                loss = self.sr_loss(data, out, K=10)
+                loss = self.sr_loss(data, out, K=100)
+                # loss = self.sr_loss(data, out, K=10)
                 loss.backward()
                 total_loss_train += loss.item() * data.num_graphs
                 self.optimizer.step()
@@ -262,8 +262,8 @@ class Benchmark100():
                 data_10 = data_10.to(self.device)
                 with torch.no_grad():
                     out_10 = self.model(data_10)
-                    # loss_10 = self.sr_loss(data_10, out_10, K=10)
-                    loss_10 = self.sr_loss(data_10, out_10, K=2)
+                    loss_10 = self.sr_loss(data_10, out_10, K=10)
+                    # loss_10 = self.sr_loss(data_10, out_10, K=2)
                     total_loss_te10 += loss_10.item() * data_10.num_graphs
             loss_te10 = (total_loss_te10 / self.num_test) * -1
 
@@ -271,8 +271,8 @@ class Benchmark100():
                 data_50 = data_50.to(self.device)
                 with torch.no_grad():
                     out_50 = self.model(data_50)
-                    # loss_50 = self.sr_loss(data_50, out_50, K=50)
-                    loss_50 = self.sr_loss(data_50, out_50, K=6)
+                    loss_50 = self.sr_loss(data_50, out_50, K=50)
+                    # loss_50 = self.sr_loss(data_50, out_50, K=6)
                     total_loss_te50 += loss_50.item() * data_50.num_graphs
             loss_te50 = (total_loss_te50 / self.num_test) * -1
 
@@ -280,12 +280,12 @@ class Benchmark100():
                 data_100 = data_100.to(self.device)
                 with torch.no_grad():
                     out_100 = self.model(data_100)
-                    # loss_100 = self.sr_loss(data_100, out_100, K=100)
-                    loss_100 = self.sr_loss(data_100, out_100, K=10)
+                    loss_100 = self.sr_loss(data_100, out_100, K=100)
+                    # loss_100 = self.sr_loss(data_100, out_100, K=10)
                     total_loss_te100 += loss_100.item() * data_100.num_graphs
             loss_te100 = (total_loss_te100 / self.num_test) * -1
 
-            if (step%25 == 0) and (is_print):
+            if is_print:
                 print('Epoch: {:03d}: [Train_10: {:.4f}] --- [Test_10: {:.4f}]  --- [Test_50: {:.4f}] --- [Test_100: {:.4f}]'.format(step, loss_tr, loss_te10, loss_te50, loss_te100))
 
             self.loss_train.append(loss_tr)

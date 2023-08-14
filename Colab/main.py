@@ -19,4 +19,5 @@ plt.xlabel("number of epoch")
 plt.ylabel('Reward')
 plt.legend()
 # %matplotlib inline
+plt.savefig('Reward100.png', bbox_inches='tight')
 plt.show()
