@@ -22,25 +22,34 @@ logger.setLevel(logging.ERROR)
 warnings.simplefilter("ignore")
 torch.manual_seed(0)
 
-def illustrate_bm(args, loss_tr, loss_te10, loss_te50, loss_te100, case = 1):
+def illustrate_bm(args, loss_tr, loss_te10, loss_te50, loss_te100, optimization10, optimization50, optimization100, case = 1):
     x = np.arange(0, args.global_rounds + 1)
+    optimization_10 = np.full_like(x, 1)*optimization10
+    optimization_50 = np.full_like(x, 1) * optimization50
+    optimization_100 = np.full_like(x, 1) * optimization100
     plt.plot(loss_tr, label='Training')
     plt.plot(loss_te10, label='Testing N = 10')
     plt.plot(loss_te50, label='Testing N = 50')
     plt.plot(loss_te100, label='Testing N = 100')
+    plt.plot(x, optimization_10, label='Optimization_10')
+    plt.plot(x, optimization_50, label='Optimization_50')
+    plt.plot(x, optimization_100, label='Optimization_100')
     plt.xlabel('Number of epoch')
     if case == 1:
         plt.ylabel('Reward N = 10')
+        plt.grid(linestyle='-.')
         plt.legend()
         plt.savefig('Reward10.png', bbox_inches='tight')
         plt.show()
     elif case == 2:
         plt.ylabel('Reward N = 50')
+        plt.grid(linestyle='-.')
         plt.legend()
         plt.savefig('Reward50.png', bbox_inches='tight')
         plt.show()
     else:
         plt.ylabel('Reward N = 100')
+        plt.grid(linestyle='-.')
         plt.legend()
         plt.savefig('Reward100.png', bbox_inches='tight')
         plt.show()
@@ -50,6 +59,9 @@ def run(args, env, benchmark_10, benchmark_50, benchmark_100):
     reporter = MemReporter()
     env.show_result_graph()
     #Calculate to compare with 1 cell train and test with same number of UE
+    optimization10 = env.calculate_optimization(case = 1)
+    optimization50 = env.calculate_optimization(case = 2)
+    optimization100 = env.calculate_optimization(case = 3)
     print('============================ Benchmark 10 ============================')
     loss_tr10, loss_tr10_te10, loss_tr10_te50, loss_tr10_te100 = benchmark_10.calculate(is_print = True)
     print('============================ Benchmark 50 ============================')
@@ -59,7 +71,7 @@ def run(args, env, benchmark_10, benchmark_50, benchmark_100):
     print('='*50)
     # illustrate_bm(args, loss_tr10, loss_tr10_te10, loss_tr10_te50, loss_tr10_te100, case=1)
     print('Illustrate_1')
-    illustrate_bm(args, loss_tr10, loss_tr10_te10, loss_tr50_te10, loss_tr100_te10, case = 1)
+    illustrate_bm(args, loss_tr10, loss_tr10_te10, loss_tr50_te10, loss_tr100_te10, optimization10, optimization50, optimization100, case = 1)
     print('Illustrate_2')
     illustrate_bm(args, loss_tr50, loss_tr10_te50, loss_tr50_te50, loss_tr100_te50, case = 2)
     print('Illustrate_3')
@@ -117,7 +129,7 @@ if __name__ == "__main__":
     parser.add_argument('-lr', "--local_learning_rate", type=float, default=0.005, help="Local learning rate")
     parser.add_argument('-ld', "--learning_rate_decay", type=bool, default=False)
     parser.add_argument('-ldg', "--learning_rate_decay_gamma", type=float, default=0.99)
-    parser.add_argument('-gr', "--global_rounds", type=int, default=50)
+    parser.add_argument('-gr', "--global_rounds", type=int, default=100)
     parser.add_argument('-ls', "--local_steps", type=int, default=1)
     parser.add_argument('-algo', "--algorithm", type=str, default="FedAvg")
     parser.add_argument('-jr', "--join_ratio", type=float, default=1.0,

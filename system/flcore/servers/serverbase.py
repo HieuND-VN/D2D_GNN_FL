@@ -312,6 +312,8 @@ class Server(object):
             plt.plot(x, optimization, label='Optimization')
             plt.xlabel('Number of epoch')
             plt.ylabel('Reward')
+            plt.grid(linestyle='-.')
+            plt.legend()
             plt.savefig('Reward_test10.png', bbox_inches='tight')
             plt.show()
         elif case == 2:
@@ -322,6 +324,8 @@ class Server(object):
             plt.plot(x, optimization, label='Optimization')
             plt.xlabel('Number of epoch')
             plt.ylabel('Reward')
+            plt.grid(linestyle='-.')
+            plt.legend()
             plt.savefig('Reward_test50.png', bbox_inches='tight')
             plt.show()
         else:
@@ -332,6 +336,8 @@ class Server(object):
             plt.plot(x, optimization, label='Optimization')
             plt.xlabel('Number of epoch')
             plt.ylabel('Reward')
-            plt.savefig('Reward_test100.png', bbox_inches='tight')
+            plt.grid(linestyle='-.')
+            plt.legend()
+            plt.savefig('Reward_test10.png', bbox_inches='tight')
             plt.show()
 

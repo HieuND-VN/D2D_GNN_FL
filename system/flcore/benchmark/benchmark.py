@@ -286,7 +286,7 @@ class Benchmark100():
             loss_te100 = (total_loss_te100 / self.num_test) * -1
 
             if is_print:
-                print('[BASE 100 ]Epoch: {:03d}: [Train_10: {:.4f}] --- [Test_10: {:.4f}]  --- [Test_50: {:.4f}] --- [Test_100: {:.4f}]'.format(step, loss_tr, loss_te10, loss_te50, loss_te100))
+                print('[BASE 100] Epoch: {:03d}: [Train_10: {:.4f}] --- [Test_10: {:.4f}]  --- [Test_50: {:.4f}] --- [Test_100: {:.4f}]'.format(step, loss_tr, loss_te10, loss_te50, loss_te100))
 
             self.loss_train.append(loss_tr)
             self.loss_test_10.append(loss_te10)
