@@ -74,7 +74,6 @@ def run(args, env, benchmark_10, benchmark_50, benchmark_100):
     print('='*50)
     # illustrate_bm(args, loss_tr10, loss_tr10_te10, loss_tr10_te50, loss_tr10_te100, case=1)
     print('Illustrate_1')
-
     illustrate_bm(args, loss_tr10, loss_tr10_te10, loss_tr50_te10, loss_tr100_te10, optimization10, optimization50, optimization100, case = 1)
     print('Illustrate_2')
     illustrate_bm(args, loss_tr50, loss_tr10_te50, loss_tr50_te50, loss_tr100_te50, optimization10, optimization50, optimization100, case = 2)
@@ -97,9 +96,7 @@ def run(args, env, benchmark_10, benchmark_50, benchmark_100):
         server.illustrate_bm(env, loss_tr10_te100, loss_tr50_te100, loss_tr100_te100, optimization100, case = 3)
 
     print(f"\n>>>>>>>>>>>>Average time cost: {round(np.average(time_list), 2)}s.")
-    # env.show_result_graph()
-    # Global average
-    # show_result_graph(args.num_user, args.test_samples, args.var_db, args.num_clients)
+
 
     reporter.report()
     '''
