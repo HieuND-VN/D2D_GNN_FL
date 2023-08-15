@@ -161,8 +161,8 @@ if __name__ == "__main__":
     parser.add_argument('-tth', "--time_threthold", type=float, default=10000,
                         help="The threthold for droping slow clients")
     # GraphNN
-    parser.add_argument('-ntr', "--num_train", type = int, default = 30)
-    parser.add_argument('-nte', "--num_test", type = int, default = 5)
+    parser.add_argument('-ntr', "--num_train", type = int, default = 3000)
+    parser.add_argument('-nte', "--num_test", type = int, default = 500)
     parser.add_argument('-uemin', "--num_ue_min", type = int, default = 2)
     parser.add_argument('-uemax', "--num_ue_max", type = int, default = 11)
     parser.add_argument('-var', "--var_db", type = int, default = 1)
