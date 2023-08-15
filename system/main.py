@@ -60,8 +60,11 @@ def run(args, env, benchmark_10, benchmark_50, benchmark_100):
     env.show_result_graph()
     #Calculate to compare with 1 cell train and test with same number of UE
     optimization10 = env.calculate_optimization(case = 1)
+    print(f'OPTIMIZATION VALUE WITH K = 10: {optimization10}')
     optimization50 = env.calculate_optimization(case = 2)
+    print(f'OPTIMIZATION VALUE WITH K = 10: {optimization50}')
     optimization100 = env.calculate_optimization(case = 3)
+    print(f'OPTIMIZATION VALUE WITH K = 10: {optimization100}')
     print('============================ Benchmark 10 ============================')
     loss_tr10, loss_tr10_te10, loss_tr10_te50, loss_tr10_te100 = benchmark_10.calculate(is_print = True)
     print('============================ Benchmark 50 ============================')
