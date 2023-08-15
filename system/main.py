@@ -125,7 +125,7 @@ if __name__ == "__main__":
     parser.add_argument('-did', "--device_id", type=str, default="0")
     parser.add_argument('-data', "--dataset", type=str, default="CFMIMO")
     parser.add_argument('-nb', "--num_classes", type=int, default=10)
-    parser.add_argument('-lbs', "--batch_size", type=int, default=100)
+    parser.add_argument('-lbs', "--batch_size", type=int, default=50)
     parser.add_argument('-lr', "--local_learning_rate", type=float, default=0.005, help="Local learning rate")
     parser.add_argument('-ld', "--learning_rate_decay", type=bool, default=False)
     parser.add_argument('-ldg', "--learning_rate_decay_gamma", type=float, default=0.99)

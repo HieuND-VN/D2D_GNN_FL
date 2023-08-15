@@ -79,8 +79,8 @@ class IGCNet100(torch.nn.Module):
         out = self.conv(x = x2, edge_index = edge_index, edge_attr = edge_attr)
         return out
 
-    def MLP(channels, batch_norm=True):
-        return Seq(*[Seq(Lin(channels[i - 1], channels[i], bias = True), ReLU())   for i in range(1, len(channels))])
+def MLP(channels, batch_norm=True):
+    return Seq(*[Seq(Lin(channels[i - 1], channels[i], bias = True), ReLU())   for i in range(1, len(channels))])
 
 class Env():
     def __init__(self):
@@ -413,4 +413,6 @@ if __name__ == "__main__":
     # ==================================================================
     plt.xlabel('Number of Epoch')
     plt.ylabel('Loss_base10')
+    plt.grid(linestyle='-.')
     plt.legend()
+    plt.show()
