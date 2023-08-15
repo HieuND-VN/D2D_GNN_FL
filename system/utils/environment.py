@@ -249,5 +249,18 @@ class Env():
         print(f'WMMSE - Unweighted Case:    {sum(self.unweighted_case)/self.num_clients}')
 
 
+    def calculate_optimization(self, case = 1):
+        if case == 1:
+            num_users = 10
+        elif case == 2:
+            num_users = 50
+        else:
+            num_users = 100
+        num_tests = self.num_test
+        Xtest, Ytest, Atest, Ytest2 = self.generate_wGaussian(num_users, num_tests)
+        optimization = self.np_sum_rate(Xtest.transpose(0, 2, 1), Ytest, Atest)
+        return optimization
+
+
 
 

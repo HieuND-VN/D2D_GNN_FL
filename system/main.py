@@ -76,6 +76,9 @@ def run(args, env, benchmark_10, benchmark_50, benchmark_100):
         server.train(env)
         time_list.append(time.time() - start)
         server.illustrate(env)
+        server.illustrate_bm(env, loss_tr10_te10, loss_tr50_te10, loss_tr100_te10, case = 1)
+        server.illustrate_bm(env, loss_tr10_te50, loss_tr50_te50, loss_tr100_te50, case = 2)
+        server.illustrate_bm(env, loss_tr10_te100, loss_tr50_te100, loss_tr100_te100, case = 3)
 
     print(f"\n>>>>>>>>>>>>Average time cost: {round(np.average(time_list), 2)}s.")
     # env.show_result_graph()
