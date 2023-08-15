@@ -62,9 +62,9 @@ def run(args, env, benchmark_10, benchmark_50, benchmark_100):
     optimization10 = env.calculate_optimization(case = 1)
     print(f'OPTIMIZATION VALUE WITH K = 10: {optimization10}')
     optimization50 = env.calculate_optimization(case = 2)
-    print(f'OPTIMIZATION VALUE WITH K = 10: {optimization50}')
+    print(f'OPTIMIZATION VALUE WITH K = 50: {optimization50}')
     optimization100 = env.calculate_optimization(case = 3)
-    print(f'OPTIMIZATION VALUE WITH K = 10: {optimization100}')
+    print(f'OPTIMIZATION VALUE WITH K = 100: {optimization100}')
     print('============================ Benchmark 10 ============================')
     loss_tr10, loss_tr10_te10, loss_tr10_te50, loss_tr10_te100 = benchmark_10.calculate(is_print = True)
     print('============================ Benchmark 50 ============================')
@@ -75,11 +75,11 @@ def run(args, env, benchmark_10, benchmark_50, benchmark_100):
     # illustrate_bm(args, loss_tr10, loss_tr10_te10, loss_tr10_te50, loss_tr10_te100, case=1)
     print('Illustrate_1')
 
-    illustrate_bm(args, loss_tr10, loss_tr10_te10, loss_tr50_te10, loss_tr100_te10, optimization10, case = 1)
+    illustrate_bm(args, loss_tr10, loss_tr10_te10, loss_tr50_te10, loss_tr100_te10, optimization10, optimization50, optimization100, case = 1)
     print('Illustrate_2')
-    illustrate_bm(args, loss_tr50, loss_tr10_te50, loss_tr50_te50, loss_tr100_te50, optimization50, case = 2)
+    illustrate_bm(args, loss_tr50, loss_tr10_te50, loss_tr50_te50, loss_tr100_te50, optimization10, optimization50, optimization100, case = 2)
     print('Illustrate_3')
-    illustrate_bm(args, loss_tr100, loss_tr10_te100, loss_tr50_te100, loss_tr100_te100, optimization100, case = 3)
+    illustrate_bm(args, loss_tr100, loss_tr10_te100, loss_tr50_te100, loss_tr100_te100, optimization10, optimization50, optimization100, case = 3)
 
 
     for i in range(args.prev, args.times):
@@ -92,9 +92,9 @@ def run(args, env, benchmark_10, benchmark_50, benchmark_100):
         server.train(env)
         time_list.append(time.time() - start)
         server.illustrate(env)
-        server.illustrate_bm(env, loss_tr10_te10, loss_tr50_te10, loss_tr100_te10, case = 1)
-        server.illustrate_bm(env, loss_tr10_te50, loss_tr50_te50, loss_tr100_te50, case = 2)
-        server.illustrate_bm(env, loss_tr10_te100, loss_tr50_te100, loss_tr100_te100, case = 3)
+        server.illustrate_bm(env, loss_tr10_te10, loss_tr50_te10, loss_tr100_te10, optimization10, case = 1)
+        server.illustrate_bm(env, loss_tr10_te50, loss_tr50_te50, loss_tr100_te50, optimization50, case = 2)
+        server.illustrate_bm(env, loss_tr10_te100, loss_tr50_te100, loss_tr100_te100, optimization100, case = 3)
 
     print(f"\n>>>>>>>>>>>>Average time cost: {round(np.average(time_list), 2)}s.")
     # env.show_result_graph()
@@ -164,10 +164,10 @@ if __name__ == "__main__":
     parser.add_argument('-tth', "--time_threthold", type=float, default=10000,
                         help="The threthold for droping slow clients")
     # GraphNN
-    parser.add_argument('-ntr', "--num_train", type = int, default = 3000)
-    parser.add_argument('-nte', "--num_test", type = int, default = 500)
-    parser.add_argument('-uemin', "--num_ue_min", type = int, default = 10)
-    parser.add_argument('-uemax', "--num_ue_max", type = int, default = 100)
+    parser.add_argument('-ntr', "--num_train", type = int, default = 30)
+    parser.add_argument('-nte', "--num_test", type = int, default = 5)
+    parser.add_argument('-uemin', "--num_ue_min", type = int, default = 2)
+    parser.add_argument('-uemax', "--num_ue_max", type = int, default = 11)
     parser.add_argument('-var', "--var_db", type = int, default = 1)
     parser.add_argument('-itf', "--interference", type = float, default = 0.5,
                         help="Normalize Interference in Case2")
