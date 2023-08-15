@@ -71,11 +71,11 @@ def run(args, env, benchmark_10, benchmark_50, benchmark_100):
     print('='*50)
     # illustrate_bm(args, loss_tr10, loss_tr10_te10, loss_tr10_te50, loss_tr10_te100, case=1)
     print('Illustrate_1')
-    illustrate_bm(args, loss_tr10, loss_tr10_te10, loss_tr50_te10, loss_tr100_te10, optimization10, optimization50, optimization100, case = 1)
+    illustrate_bm(args, loss_tr10, loss_tr10_te10, loss_tr50_te10, loss_tr100_te10, optimization10, case = 1)
     print('Illustrate_2')
-    illustrate_bm(args, loss_tr50, loss_tr10_te50, loss_tr50_te50, loss_tr100_te50, case = 2)
+    illustrate_bm(args, loss_tr50, loss_tr10_te50, loss_tr50_te50, loss_tr100_te50, optimization50, case = 2)
     print('Illustrate_3')
-    illustrate_bm(args, loss_tr100, loss_tr10_te100, loss_tr50_te100, loss_tr100_te100, case = 3)
+    illustrate_bm(args, loss_tr100, loss_tr10_te100, loss_tr50_te100, loss_tr100_te100, optimization100, case = 3)
 
 
     for i in range(args.prev, args.times):

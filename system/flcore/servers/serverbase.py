@@ -300,9 +300,9 @@ class Server(object):
         plt.savefig('Reward_global_vs_test.png', bbox_inches='tight')
         plt.show()
 
-    def illustrate_bm(self, env, loss_tr10, loss_tr50, loss_tr100, case = 1):
+    def illustrate_bm(self, loss_tr10, loss_tr50, loss_tr100, optimization_value, case = 1):
         x = np.arange(0, self.global_rounds+1)
-        optimization = np.full_like(x,1)*(env.calculate_optimization(case))
+        optimization = np.full_like(x,1)*optimization_value
         plt.plot(self.test_loss_client_save, label='GraphFL global test')
         if case == 1:
             plt.plot(self.test_loss_10_save, label='Decentralized, Te = 10')
